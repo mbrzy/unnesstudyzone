@@ -1,0 +1,525 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perpanjang Paket - PNF STUDY ZONE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+    }
+    
+    /* Modern gradient backgrounds */
+    .bg-gradient-blue {
+      background: linear-gradient(135deg, #4F46E5 0%, #2563EB 100%);
+    }
+    
+    .bg-gradient-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    }
+    
+    /* Custom animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientShift 5s ease infinite;
+    }
+    
+    /* Modern card hover effects */
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Loading spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Toast notification animation */
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    
+    /* Scroll progress indicator */
+    .progress-bar {
+      height: 3px;
+      background: #3b82f6;
+      width: 0%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      transition: width 0.2s ease;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #3b82f6;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2563eb;
+    }
+    
+    /* Back-to-top button */
+    .back-to-top {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .back-to-top.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .tooltip-parent:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Modal */
+    .modal {
+      transition: opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Progress bar for scroll indicator -->
+  <div class="progress-bar" id="scrollProgress"></div>
+
+  <!-- Loading spinner -->
+  <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full loading-spinner"></div>
+  </div>
+  
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
+    <div class="flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span id="toastMessage">Perpanjangan paket berhasil!</span>
+    </div>
+  </div>
+
+  <!-- Renewal Confirmation Modal -->
+  <div id="renewalModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full card-hover" data-aos="zoom-in">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">Konfirmasi Perpanjangan</h3>
+      <p class="text-gray-600 mb-4">Anda akan memperpanjang paket <span id="modalPackage">Belum dipilih</span> dengan metode <span id="modalMethod">Belum dipilih</span>.</p>
+      <p class="text-gray-600 mb-6">Nominal: <span id="modalAmount">Rp 0</span></p>
+      <div class="flex justify-end gap-4">
+        <button id="cancelRenewal" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all">Batal</button>
+        <button id="confirmRenewal" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">Perpanjang Sekarang</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-2">
+          <div class="text-2xl font-bold flex items-center">
+            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
+            <a href="index.html" class="hover:opacity-80 transition-opacity">PNF STUDY ZONE</a>
+          </div>
+        </div>
+        
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="index.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-home mr-1"></i> Home
+          </a>
+          <a href="tryout.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-file-alt mr-1"></i> Tryout
+          </a>
+          <a href="materi.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-book mr-1"></i> Materi
+          </a>
+          <a href="paket.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-credit-card mr-1"></i> Paket
+          </a>
+          <a href="akun.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-user-circle mr-1"></i> Akun
+          </a>
+          <div class="border-l pl-4 border-blue-400">
+            <a href="login.html" class="hover:text-blue-200 transition-colors duration-200 mr-4">
+              <i class="fas fa-sign-in-alt mr-1"></i> Login
+            </a>
+            <a href="register.html" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-lg font-medium hover:bg-yellow-300 transition-all">
+              <i class="fas fa-user-plus mr-1"></i> Sign Up
+            </a>
+          </div>
+        </div>
+        
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="menuBtn" class="text-white focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="md:hidden hidden mobile-menu pb-4">
+        <div class="flex flex-col space-y-3">
+          <a href="index.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-home mr-2"></i> Home
+          </a>
+          <a href="tryout.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-file-alt mr-2"></i> Tryout
+          </a>
+          <a href="materi.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-book mr-2"></i> Materi
+          </a>
+          <a href="paket.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-credit-card mr-2"></i> Paket
+          </a>
+          <a href="akun.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-user-circle mr-2"></i> Akun
+          </a>
+          <div class="pt-2 border-t border-blue-400 flex flex-col space-y-2">
+            <a href="login.html" class="bg-blue-700 py-2 px-4 rounded-md text-center transition-colors">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+            <a href="register.html" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-md text-center font-medium">
+              <i class="fas fa-user-plus mr-2"></i> Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
+      <div class="absolute top-20 right-20 w-60 h-60 bg-blue-300 rounded-full opacity-10 animate-float"></div>
+      <div class="absolute bottom-10 left-1/3 w-40 h-40 bg-indigo-400 rounded-full opacity-10" style="animation: float 4s ease-in-out infinite;"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 relative z-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Perpanjang Paket Anda</h1>
+      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Lanjutkan akses ke tryout dan materi dengan memperpanjang atau memilih paket baru.</p>
+    </div>
+  </section>
+
+  <!-- Packages Section -->
+  <section id="packages" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Pilih Paket untuk Perpanjangan</h2>
+        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Pilih paket yang sesuai untuk melanjutkan pembelajaran Anda.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent" data-aos="fade-up" data-aos-delay="100">
+          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Akses 1x Tryout untuk 1 Mata Kuliah</div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">BASIC</h3>
+          <p class="text-gray-600 mb-4">Akses 1x Tryout untuk 1 Mata Kuliah</p>
+          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 5.000</p>
+          <button data-package="BASIC" data-price="5000" class="select-package w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2"></i> Pilih Paket
+          </button>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent border-2 border-yellow-400" data-aos="fade-up" data-aos-delay="150">
+          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Akses semua Tryout + Feedback Nilai (Paket Saat Ini)</div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">PREMIUM</h3>
+          <p class="text-gray-600 mb-4">Akses ke semua Tryout + Feedback Nilai</p>
+          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 15.000</p>
+          <button data-package="PREMIUM" data-price="15000" class="select-package w-full bg-yellow-400 text-blue-900 py-2 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2"></i> Paket Saat Ini
+          </button>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent" data-aos="fade-up" data-aos-delay="200">
+          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Paket untuk 5 orang untuk 1x Tryout</div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">GROUP</h3>
+          <p class="text-gray-600 mb-4">Paket untuk 5 orang untuk 1x Tryout</p>
+          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 20.000</p>
+          <button data-package="GROUP" data-price="20000" class="select-package w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center justify-center">
+            <i class="fas fa-check-circle mr-2"></i> Pilih Paket
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Renewal Details Section -->
+  <section id="renewal-details" class="py-16 bg-gray-100">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Detail Perpanjangan</h2>
+      <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6 bg-gradient-card card-hover" data-aos="fade-up" data-aos-delay="100">
+        <div class="mb-4">
+          <p class="text-gray-600">Nama Paket: <span id="selectedPackage" class="font-semibold">PREMIUM</span></p>
+          <p class="text-gray-600 mt-2">Nominal Perpanjangan: <span id="selectedPrice" class="font-semibold">Rp 15.000</span></p>
+          <p class="text-gray-600 mt-2">Masa Aktif Baru: <span id="newExpiry" class="font-semibold">31 Desember 2026</span></p>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Pilih Metode Pembayaran</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <button data-method="Transfer Bank" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
+            <i class="fas fa-university mr-2"></i> Transfer Bank
+          </button>
+          <button data-method="QRIS" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
+            <i class="fas fa-qrcode mr-2"></i> QRIS
+          </button>
+          <button data-method="E-Wallet" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
+            <i class="fas fa-wallet mr-2"></i> E-Wallet
+          </button>
+        </div>
+        <p id="renewalInstruction" class="text-gray-600 text-center mb-6">Pilih metode pembayaran untuk memperpanjang paket PREMIUM.</p>
+        <div class="flex justify-center gap-4">
+          <a href="https://whatsapp.com" target="_blank" class="bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-all flex items-center">
+            <i class="fab fa-whatsapp mr-2"></i> Hubungi Admin
+          </a>
+          <button id="renewNowBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center disabled:bg-gray-400" disabled>
+            <i class="fas fa-sync-alt mr-2"></i> Perpanjang Sekarang
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 PNF STUDY ZONE. All rights reserved.</p>
+      <div class="flex justify-center space-x-4 mb-4">
+        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+      </div>
+      <div class="flex justify-center space-x-4">
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Contact Us</a>
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Privacy Policy</a>
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Terms of Service</a>
+      </div>
+      <p class="mt-4 text-gray-400">Email: info@pnfstudyzone.com | Phone: +62 123 456 7890</p>
+    </div>
+  </footer>
+
+  <!-- Back-to-Top Button -->
+  <button id="backToTop" class="fixed bottom-5 right-5 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all back-to-top hidden">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // Initialize AOS
+    AOS.init({ duration: 800, once: true });
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      menuBtn.querySelector('i').classList.toggle('fa-bars');
+      menuBtn.querySelector('i').classList.toggle('fa-times');
+    });
+
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+    });
+
+    // Back-to-top button
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTop.classList.remove('hidden');
+      } else {
+        backToTop.classList.add('hidden');
+      }
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Package selection
+    let selectedPackage = 'PREMIUM';
+    let selectedPrice = '15000';
+    let selectedMethod = null;
+    const packageButtons = document.querySelectorAll('.select-package');
+    const methodButtons = document.querySelectorAll('.select-method');
+    const selectedPackageDisplay = document.getElementById('selectedPackage');
+    const selectedPriceDisplay = document.getElementById('selectedPrice');
+    const newExpiryDisplay = document.getElementById('newExpiry');
+    const renewalInstruction = document.getElementById('renewalInstruction');
+    const renewNowBtn = document.getElementById('renewNowBtn');
+
+    packageButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        packageButtons.forEach(btn => {
+          btn.classList.remove('bg-yellow-400', 'text-blue-900');
+          btn.classList.add('bg-blue-600', 'text-white');
+          btn.innerHTML = `<i class="fas fa-check-circle mr-2"></i> Pilih Paket`;
+        });
+        button.classList.add('bg-yellow-400', 'text-blue-900');
+        button.innerHTML = `<i class="fas fa-check-circle mr-2"></i> Paket Dipilih`;
+        selectedPackage = button.getAttribute('data-package');
+        selectedPrice = button.getAttribute('data-price');
+        selectedPackageDisplay.textContent = selectedPackage;
+        selectedPriceDisplay.textContent = `Rp ${parseInt(selectedPrice).toLocaleString()}`;
+        newExpiryDisplay.textContent = selectedPackage === 'PREMIUM' ? '31 Desember 2026' : '31 Desember 2025';
+        updateRenewalState();
+      });
+    });
+
+    // Payment method selection
+    methodButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        methodButtons.forEach(btn => btn.classList.remove('bg-blue-200'));
+        button.classList.add('bg-blue-200');
+        selectedMethod = button.getAttribute('data-method');
+        updateRenewalState();
+      });
+    });
+
+    // Update renewal state
+    function updateRenewalState() {
+      if (selectedPackage && selectedMethod) {
+        renewalInstruction.textContent = `Lanjutkan pembayaran untuk memperpanjang paket ${selectedPackage} melalui ${selectedMethod}.`;
+        renewNowBtn.disabled = false;
+      } else {
+        renewalInstruction.textContent = `Pilih metode pembayaran untuk memperpanjang paket ${selectedPackage}.`;
+        renewNowBtn.disabled = true;
+      }
+    }
+
+    // Renewal modal
+    const renewalModal = document.getElementById('renewalModal');
+    const modalPackage = document.getElementById('modalPackage');
+    const modalMethod = document.getElementById('modalMethod');
+    const modalAmount = document.getElementById('modalAmount');
+    const cancelRenewal = document.getElementById('cancelRenewal');
+    const confirmRenewal = document.getElementById('confirmRenewal');
+
+    renewNowBtn.addEventListener('click', () => {
+      modalPackage.textContent = selectedPackage;
+      modalMethod.textContent = selectedMethod;
+      modalAmount.textContent = `Rp ${parseInt(selectedPrice).toLocaleString()}`;
+      renewalModal.classList.remove('hidden');
+    });
+
+    cancelRenewal.addEventListener('click', () => {
+      renewalModal.classList.add('hidden');
+    });
+
+    confirmRenewal.addEventListener('click', () => {
+      renewalModal.classList.add('hidden');
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = 'Perpanjangan paket berhasil! Anda akan diarahkan ke halaman akun.';
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        window.location.href = 'akun.html';
+      }, 2000);
+    });
+
+    // Show loading spinner on page transition
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
+          document.getElementById('loading').classList.remove('hidden');
+        }
+      });
+    });
+
+    // Initialize renewal state
+    updateRenewalState();
+  </script>
+</body>
+</html>

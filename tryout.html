@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tryout - UNNES STUDY ZONE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
+    }
+    
+    /* Modern gradient backgrounds */
+    .bg-gradient-blue {
+      background: linear-gradient(135deg, #4F46E5 0%, #2563EB 100%);
+    }
+    
+    .bg-gradient-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    }
+    
+    /* Custom animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .animate-gradient {
+      background-size: 200% 200%;
+      animation: gradientShift 5s ease infinite;
+    }
+    
+    /* Modern card hover effects */
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Loading spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Toast notification animation */
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    
+    /* Scroll progress indicator */
+    .progress-bar {
+      height: 3px;
+      background: #3b82f6;
+      width: 0%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      transition: width 0.2s ease;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #3b82f6;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #2563eb;
+    }
+    
+    /* Back-to-top button */
+    .back-to-top {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .back-to-top.hidden {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    
+    /* Progress tracker */
+    .progress-tracker {
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- Progress bar for scroll indicator -->
+  <div class="progress-bar" id="scrollProgress"></div>
+
+  <!-- Loading spinner -->
+  <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full loading-spinner"></div>
+  </div>
+  
+  <!-- Toast notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
+    <div class="flex items-center">
+      <i class="fas fa-check-circle mr-2"></i>
+      <span id="toastMessage">Jawaban berhasil disimpan!</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-center py-4">
+        <div class="flex items-center space-x-2">
+          <div class="text-2xl font-bold flex items-center">
+            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
+            <a href="index.html" class="hover:opacity-80 transition-opacity">UNNES STUDY ZONE</a>
+          </div>
+        </div>
+        
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex items-center space-x-6">
+          <a href="index.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-home mr-1"></i> Home
+          </a>
+          <a href="tryout.html" class="text-yellow-300 transition-colors duration-200 flex items-center">
+            <i class="fas fa-file-alt mr-1"></i> Tryout
+          </a>
+          <a href="materi.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-book mr-1"></i> Materi
+          </a>
+          <a href="paket.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-credit-card mr-1"></i> Paket
+          </a>
+          <a href="akun.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
+            <i class="fas fa-user-circle mr-1"></i> Akun
+          </a>
+          <div class="border-l pl-4 border-blue-400">
+            <a href="login.html" class="hover:text-blue-200 transition-colors duration-200 mr-4">
+              <i class="fas fa-sign-in-alt mr-1"></i> Login
+            </a>
+            <a href="register.html" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-lg font-medium hover:bg-yellow-300 transition-all">
+              <i class="fas fa-user-plus mr-1"></i> Sign Up
+            </a>
+          </div>
+        </div>
+        
+        <!-- Mobile menu button -->
+        <div class="md:hidden">
+          <button id="menuBtn" class="text-white focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="md:hidden hidden mobile-menu pb-4">
+        <div class="flex flex-col space-y-3">
+          <a href="index.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-home mr-2"></i> Home
+          </a>
+          <a href="tryout.html" class="bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-file-alt mr-2"></i> Tryout
+          </a>
+          <a href="materi.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-book mr-2"></i> Materi
+          </a>
+          <a href="paket.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-credit-card mr-2"></i> Paket
+          </a>
+          <a href="akun.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-user-circle mr-2"></i> Akun
+          </a>
+          <div class="pt-2 border-t border-blue-400 flex flex-col space-y-2">
+            <a href="login.html" class="bg-blue-700 py-2 px-4 rounded-md text-center transition-colors">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
+            </a>
+            <a href="register.html" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-md text-center font-medium">
+              <i class="fas fa-user-plus mr-2"></i> Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
+      <div class="absolute top-20 right-20 w-60 h-60 bg-blue-300 rounded-full opacity-10 animate-float"></div>
+      <div class="absolute bottom-10 left-1/3 w-40 h-40 bg-indigo-400 rounded-full opacity-10" style="animation: float 4s ease-in-out infinite;"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 relative z-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Tryout Pendidikan Pancasila</h1>
+      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Uji kemampuan Anda dengan soal-soal berkualitas tinggi dan dapatkan hasil serta pembahasan instan.</p>
+      <div class="flex items-center justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+        <span class="text-xl font-semibold">Waktu Tersisa: <span id="timer">10:00</span></span>
+        <button id="saveProgressBtn" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105">
+          <i class="fas fa-save mr-2"></i> Simpan Progres
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Question Progress Tracker -->
+  <section class="py-8 bg-gray-100 sticky top-16 z-30 shadow-md">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center justify-between">
+        <div class="w-full">
+          <div class="h-2 bg-gray-300 rounded-full">
+            <div id="questionProgress" class="h-2 bg-blue-600 rounded-full progress-tracker" style="width: 0%;"></div>
+          </div>
+          <p class="text-sm text-gray-600 mt-2">Soal: <span id="currentQuestion">0</span>/10</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tryout Questions -->
+  <section id="questions" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="space-y-6">
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-lg font-semibold mb-4">1. Apa arti Pancasila sila ke-3?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q1" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Persatuan Indonesia</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q1" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Keadilan Sosial</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q1" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Ketuhanan Yang Maha Esa</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q1" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Kemanusiaan yang Adil dan Beradab</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="150">
+          <h3 class="text-lg font-semibold mb-4">2. Siapa proklamator kemerdekaan Indonesia?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q2" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Soekarno dan Hatta</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q2" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Soedirman dan Diponegoro</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q2" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Bung Tomo dan Sutan Sjahrir</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q2" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Muhammad Hatta dan A. R. Baswedan</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-lg font-semibold mb-4">3. Apa bunyi sila pertama Pancasila?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q3" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Ketuhanan Yang Maha Esa</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q3" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Kemanusiaan yang Adil dan Beradab</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q3" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Persatuan Indonesia</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q3" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Keadilan Sosial bagi Seluruh Rakyat Indonesia</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="250">
+          <h3 class="text-lg font-semibold mb-4">4. Apa simbol negara Indonesia?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q4" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Garuda Pancasila</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q4" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Bintang Kejora</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q4" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Peta Indonesia</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q4" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Padi dan Kapas</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="text-lg font-semibold mb-4">5. Siapa tokoh yang mengusulkan Pancasila sebagai dasar negara?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q5" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Soekarno</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q5" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Mohammad Hatta</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q5" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Joko Widodo</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q5" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Sukarno Hatta</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="350">
+          <h3 class="text-lg font-semibold mb-4">6. Apa yang dimaksud dengan Keadilan Sosial?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q6" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Pemerataan ekonomi</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q6" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Pemberdayaan rakyat</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q6" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Persatuan bangsa</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q6" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Keberagaman sosial</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="400">
+          <h3 class="text-lg font-semibold mb-4">7. Pancasila diusulkan pertama kali pada tahun berapa?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q7" value="a" class="mr-2 focus:ring-blue-600">
+              <span>1945</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q7" value="b" class="mr-2 focus:ring-blue-600">
+              <span>1947</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q7" value="c" class="mr-2 focus:ring-blue-600">
+              <span>1940</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q7" value="d" class="mr-2 focus:ring-blue-600">
+              <span>1950</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="450">
+          <h3 class="text-lg font-semibold mb-4">8. Apa tujuan dari Pancasila sebagai dasar negara?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q8" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Untuk mempersatukan bangsa</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q8" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Untuk memperjuangkan kemerdekaan</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q8" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Untuk mendirikan negara</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q8" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Untuk meningkatkan perekonomian</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="500">
+          <h3 class="text-lg font-semibold mb-4">9. Siapa penulis naskah proklamasi kemerdekaan Indonesia?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q9" value="a" class="mr-2 focus:ring-blue-600">
+              <span>Soekarno</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q9" value="b" class="mr-2 focus:ring-blue-600">
+              <span>Sukarno dan Hatta</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q9" value="c" class="mr-2 focus:ring-blue-600">
+              <span>Sutan Sjahrir</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q9" value="d" class="mr-2 focus:ring-blue-600">
+              <span>Mohammad Hatta</span>
+            </label>
+          </div>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="550">
+          <h3 class="text-lg font-semibold mb-4">10. Pada tanggal berapa Indonesia memproklamirkan kemerdekaannya?</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="radio" name="q10" value="a" class="mr-2 focus:ring-blue-600">
+              <span>17 Agustus 1945</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q10" value="b" class="mr-2 focus:ring-blue-600">
+              <span>18 Agustus 1945</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q10" value="c" class="mr-2 focus:ring-blue-600">
+              <span>16 Agustus 1945</span>
+            </label>
+            <label class="flex items-center">
+              <input type="radio" name="q10" value="d" class="mr-2 focus:ring-blue-600">
+              <span>1 Juni 1945</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="text-center mt-8">
+        <button id="submitBtn" class="bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105" data-aos="fade-up" data-aos-delay="600">
+          <i class="fas fa-paper-plane mr-2"></i> Kirim Jawaban
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tryout Results -->
+  <section id="results" class="py-16 bg-gray-100 hidden">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Hasil Tryout</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center" data-aos="fade-up" data-aos-delay="100">
+        <p class="text-xl font-semibold mb-4">Skor Anda: <span id="score">0</span>/100</p>
+        <p class="text-gray-600 mb-4">Jawaban Benar: <span id="correctAnswers">0</span>/10</p>
+        <div class="h-4 bg-gray-300 rounded-full">
+          <div id="scoreProgress" class="h-4 bg-blue-600 rounded-full progress-tracker" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explanations -->
+  <section id="explanations" class="py-16 bg-white hidden">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Pembahasan Soal</h2>
+      <div class="space-y-6">
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-lg font-semibold mb-2">1. Apa arti Pancasila sila ke-3?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Persatuan Indonesia</strong></p>
+          <p class="text-gray-600">Penjelasan: Sila ke-3 Pancasila berbunyi "Persatuan Indonesia," yang menekankan pentingnya persatuan dan kesatuan bangsa.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="150">
+          <h3 class="text-lg font-semibold mb-2">2. Siapa proklamator kemerdekaan Indonesia?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Soekarno dan Hatta</strong></p>
+          <p class="text-gray-600">Penjelasan: Soekarno dan Mohammad Hatta atas nama bangsa Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-lg font-semibold mb-2">3. Apa bunyi sila pertama Pancasila?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Ketuhanan Yang Maha Esa</strong></p>
+          <p class="text-gray-600">Penjelasan: Sila pertama Pancasila berbunyi "Ketuhanan Yang Maha Esa," yang mencerminkan keimanan kepada Tuhan.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="250">
+          <h3 class="text-lg font-semibold mb-2">4. Apa simbol negara Indonesia?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Garuda Pancasila</strong></p>
+          <p class="text-gray-600">Penjelasan: Garuda Pancasila adalah lambang negara Indonesia, yang mencerminkan nilai-nilai Pancasila.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="text-lg font-semibold mb-2">5. Siapa tokoh yang mengusulkan Pancasila sebagai dasar negara?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Soekarno</strong></p>
+          <p class="text-gray-600">Penjelasan: Soekarno mengusulkan Pancasila sebagai dasar negara pada sidang BPUPKI tanggal 1 Juni 1945.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="350">
+          <h3 class="text-lg font-semibold mb-2">6. Apa yang dimaksud dengan Keadilan Sosial?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Pemerataan ekonomi</strong></p>
+          <p class="text-gray-600">Penjelasan: Keadilan Sosial dalam Pancasila sila ke-5 mengacu pada pemerataan ekonomi untuk kesejahteraan rakyat.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="400">
+          <h3 class="text-lg font-semibold mb-2">7. Pancasila diusulkan pertama kali pada tahun berapa?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>1945</strong></p>
+          <p class="text-gray-600">Penjelasan: Pancasila diusulkan pada sidang BPUPKI pada tahun 1945.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="450">
+          <h3 class="text-lg font-semibold mb-2">8. Apa tujuan dari Pancasila sebagai dasar negara?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Untuk mempersatukan bangsa</strong></p>
+          <p class="text-gray-600">Penjelasan: Pancasila bertujuan untuk mempersatukan bangsa Indonesia dengan nilai-nilai yang menjadi pedoman bersama.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="500">
+          <h3 class="text-lg font-semibold mb-2">9. Siapa penulis naskah proklamasi kemerdekaan Indonesia?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>Sukarno dan Hatta</strong></p>
+          <p class="text-gray-600">Penjelasan: Naskah proklamasi disusun oleh Soekarno, Mohammad Hatta, dan Ahmad Soebardjo.</p>
+        </div>
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="550">
+          <h3 class="text-lg font-semibold mb-2">10. Pada tanggal berapa Indonesia memproklamirkan kemerdekaannya?</h3>
+          <p class="text-gray-600">Jawaban benar: <strong>17 Agustus 1945</strong></p>
+          <p class="text-gray-600">Penjelasan: Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945 di Jakarta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 UNNES STUDY ZONE. All rights reserved.</p>
+      <div class="flex justify-center space-x-4 mb-4">
+        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+      </div>
+      <div class="flex justify-center space-x-4">
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Contact Us</a>
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Privacy Policy</a>
+        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Terms of Service</a>
+      </div>
+      <p class="mt-4 text-gray-400">Email: info@unnesstudyzone.com | Phone: +62 123 456 7890</p>
+    </div>
+  </footer>
+
+  <!-- Back-to-Top Button -->
+  <button id="backToTop" class="fixed bottom-5 right-5 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all back-to-top hidden">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    // Initialize AOS
+    AOS.init({ duration: 800, once: true });
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      menuBtn.querySelector('i').classList.toggle('fa-bars');
+      menuBtn.querySelector('i').classList.toggle('fa-times');
+    });
+
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+    });
+
+    // Back-to-top button
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTop.classList.remove('hidden');
+      } else {
+        backToTop.classList.add('hidden');
+      }
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Countdown timer
+    let timeLeft = 10 * 60; // 10 minutes in seconds
+    const timerDisplay = document.getElementById('timer');
+    const submitBtn = document.getElementById('submitBtn');
+    function updateTimer() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        timerDisplay.textContent = 'Waktu Habis!';
+        submitAnswers();
+      }
+      timeLeft--;
+    }
+    const timerInterval = setInterval(updateTimer, 1000);
+
+    // Question progress tracker
+    const questionInputs = document.querySelectorAll('input[type="radio"]');
+    const currentQuestionDisplay = document.getElementById('currentQuestion');
+    const questionProgress = document.getElementById('questionProgress');
+    function updateProgress() {
+      const answeredQuestions = Array.from(questionInputs).filter(input => input.checked).length / 4; // Each question has 4 options
+      currentQuestionDisplay.textContent = answeredQuestions;
+      questionProgress.style.width = (answeredQuestions / 10) * 100 + '%';
+    }
+    questionInputs.forEach(input => {
+      input.addEventListener('change', updateProgress);
+    });
+
+    // Save progress
+    document.getElementById('saveProgressBtn').addEventListener('click', () => {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = 'Progres berhasil disimpan!';
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 3000);
+    });
+
+    // Submit answers
+    function submitAnswers() {
+      const correctAnswers = {
+        q1: 'a', q2: 'a', q3: 'a', q4: 'a', q5: 'a',
+        q6: 'a', q7: 'a', q8: 'a', q9: 'b', q10: 'a'
+      };
+      let score = 0;
+      let correctCount = 0;
+      for (let i = 1; i <= 10; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === correctAnswers[`q${i}`]) {
+          score += 10;
+          correctCount++;
+        }
+      }
+      document.getElementById('score').textContent = score;
+      document.getElementById('correctAnswers').textContent = correctCount;
+      document.getElementById('scoreProgress').style.width = score + '%';
+      document.getElementById('results').classList.remove('hidden');
+      document.getElementById('explanations').classList.remove('hidden');
+      submitBtn.disabled = true;
+      clearInterval(timerInterval);
+      timerDisplay.textContent = 'Selesai';
+      window.scrollTo({ top: document.getElementById('results').offsetTop, behavior: 'smooth' });
+    }
+    submitBtn.addEventListener('click', submitAnswers);
+
+    // Show loading spinner on page transition
+    document.querySelectorAll('a[href]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
+          document.getElementById('loading').classList.remove('hidden');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
