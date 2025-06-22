@@ -5,195 +5,385 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UNNES STUDY ZONE - Platform Persiapan UAS & UTS Online #1 di Indonesia</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    body {
-      font-family: 'Poppins', sans-serif;
+    * {
+      font-family: 'Inter', sans-serif;
       scroll-behavior: smooth;
-    }
-    
-    /* Modern gradient backgrounds */
-    .bg-gradient-blue {
-      background: linear-gradient(135deg, #4F46E5 0%, #2563EB 100%);
-    }
-    
-    .bg-gradient-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
-    }
-    
-    /* Custom animations */
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    .animate-float {
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    
-    .animate-gradient {
-      background-size: 200% 200%;
-      animation: gradientShift 5s ease infinite;
-    }
-    
-    /* Modern card hover effects */
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    
-    .card-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-    
-    /* Stats counter animation */
-    @keyframes countUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .count-up {
-      animation: countUp 1s ease-out forwards;
-    }
-    
-    /* Mobile menu animation */
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .mobile-menu {
-      animation: slideDown 0.3s ease-out forwards;
-    }
-    
-    /* Loading spinner animation */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .loading-spinner {
-      animation: spin 1s linear infinite;
-    }
-    
-    /* Toast notification animation */
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    .toast {
-      animation: slideIn 0.3s ease-out forwards;
-    }
-    
-    /* Scroll progress indicator */
-    .progress-bar {
-      height: 3px;
-      background: #3b82f6;
-      width: 0%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 9999;
-      transition: width 0.2s ease;
     }
     
     /* Custom scrollbar */
     ::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
+    }
+
+    body {
+      padding-top: var(--navbar-height, 90px);
+    }
+
+    nav#navbar {
+      height: var(--navbar-height, 90px);
     }
     
     ::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #f1f5f9;
     }
     
     ::-webkit-scrollbar-thumb {
-      background: #3b82f6;
-      border-radius: 4px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 10px;
     }
     
-    ::-webkit-scrollbar-thumb:hover {
-      background: #2563eb;
+    /* Glassmorphism effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    /* Back-to-top button */
-    .back-to-top {
-      transition: opacity 0.3s ease, transform 0.3s ease;
+    .glass-dark {
+      background: rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    .back-to-top.hidden {
+    /* Modern gradients */
+    .bg-gradient-modern {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .bg-gradient-hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
+    }
+    
+    .bg-gradient-card {
+      background: linear(#ffffff 0%, #f8fafc 100%);
+    }
+    
+    /* Custom animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-10px) rotate(1deg); }
+      66% { transform: translateY(-5px) rotate(-1deg); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+      50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8), 0 0 40px rgba(147, 51, 234, 0.3); }
+    }
+    
+    @keyframes slideInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(30px);
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes morphing {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    .animate-slide-up { animation: slideInUp 0.8s ease-out forwards; }
+    .animate-morphing { animation: morphing 8s ease-in-out infinite; }
+    
+    .shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    
+    /* Interactive elements */
+    .interactive-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .interactive-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Magnetic effect */
+    .magnetic {
+      transition: transform 0.3s ease;
+    }
+    
+    /* Modern button styles */
+    .btn-modern {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .btn-modern:hover::before {
+      left: 100%;
+    }
+    
+    /* Particle background */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: particleFloat 10s infinite linear;
+    }
+    
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Progress indicator */
+    .progress-ring {
+      transition: stroke-dasharray 0.3s ease;
+    }
+    
+    /* Tooltip styles */
+    .tooltip {
+      visibility: hidden;
       opacity: 0;
-      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+    
+    .tooltip-parent:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    /* Rotate class for FAQ */
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+
+    /* Navbar initial state */
+    #navbar {
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    #navbar.scrolled {
+      background: rgba(15, 23, 42, 0.8); /* bg-slate-900 with opacity */
+      backdrop-filter: blur(10px);
+    }
+
+    #mobileMenu {
+      z-index: 40;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
+    }
+
+    #navbar {
+      z-index: 50;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
+    }
+
+    /* Mobile menu links */
+    #mobileMenu a {
+      color: white;
+      display: block;
+    }
+
+    /* Count-up animation */
+    .count-up {
+      transition: all 0.5s ease-out;
+    }
+
+    /* Q&A Bot styles */
+    #qaBotContainer {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
+        transform: scale(0.8);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease-in-out;
+    }
+
+    #qaBotContainer.open {
+        transform: scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    #qaBotHeader {
+        background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    #qaBotMessages {
+        flex-grow: 1;
+        padding: 15px;
+        overflow-y: auto;
+        background-color: #f0f2f5;
+    }
+
+    .qa-message {
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        max-width: 80%;
+    }
+
+    .qa-message.user {
+        background-color: #dcf8c6;
+        align-self: flex-end;
+        margin-left: auto;
+    }
+
+    .qa-message.bot {
+        background-color: #e0e0e0;
+        align-self: flex-start;
+        margin-right: auto;
+    }
+
+    #qaBotInputContainer {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #eee;
+        background-color: white;
+    }
+
+    #qaBotInput {
+        flex-grow: 1;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 8px 15px;
+        margin-right: 10px;
+        outline: none;
+    }
+
+    #qaBotSendBtn {
+        background: linear-gradient(135deg, #1e3a8a, #7c3aed);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 18px;
+        transition: background 0.3s ease;
+    }
+
+    #qaBotSendBtn:hover {
+        opacity: 0.9;
     }
   </style>
 </head>
-<body class="bg-gray-50">
-  <!-- Progress bar for scroll indicator -->
-  <div class="progress-bar" id="scrollProgress"></div>
-
-  <!-- Loading spinner -->
-  <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full loading-spinner"></div>
-  </div>
-  
-  <!-- Toast notification -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
-    <div class="flex items-center">
-      <i class="fas fa-check-circle mr-2"></i>
-      <span id="toastMessage">Operasi berhasil!</span>
+<body class="bg-gray-50 overflow-x-hidden">
+  <div id="loadingScreen" class="fixed inset-0 bg-gradient-hero flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mb-4"></div>
+      <h2 class="text-white text-xl font-semibold animate-pulse">Loading UNNES STUDY ZONE...</h2>
     </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+  <div class="fixed top-0 left-0 w-full h-1 bg-gray-200 z-50">
+    <div id="scrollProgress" class="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 ease-out" style="width: 0%"></div>
+  </div>
+
+  <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center py-4">
-        <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold flex items-center">
-            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
-            <a href="index.html" class="hover:opacity-80 transition-opacity">UNNES STUDY ZONE</a>
+        <div class="flex items-center space-x-3">
+          <div class="text-2xl font-bold flex items-center text-white">
+            <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center mr-3 animate-pulse-glow">
+              <img src="logo.png" alt="Logo" class="w-8 h-8">
+            </div>
+            <span class="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+              UNNES STUDY ZONE
+            </span>
           </div>
         </div>
         
-        <!-- Desktop Menu -->
-        <div class="hidden md:flex items-center space-x-6">
-          <a href="index.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
-            <i class="fas fa-home mr-1"></i> Home
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="#home" class="nav-link text-white hover:text-yellow-300 transition-all duration-300 flex items-center">
+            <i class="fas fa-home mr-2"></i> Home
           </a>
-          <a href="tryout.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
-            <i class="fas fa-file-alt mr-1"></i> Tryout
+          <a href="#features" class="nav-link text-white hover:text-yellow-300 transition-all duration-300 flex items-center">
+            <i class="fas fa-star mr-2"></i> Features
           </a>
-          <a href="materi.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
-            <i class="fas fa-book mr-1"></i> Materi
+          <a href="#subjects" class="nav-link text-white hover:text-yellow-300 transition-all duration-300 flex items-center">
+            <i class="fas fa-book mr-2"></i> Subjects
           </a>
-          <a href="paket.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
-            <i class="fas fa-credit-card mr-1"></i> Paket
+          <a href="#packages" class="nav-link text-white hover:text-yellow-300 transition-all duration-300 flex items-center">
+            <i class="fas fa-credit-card mr-2"></i> Packages
           </a>
-          <a href="akun.html" class="hover:text-blue-200 transition-colors duration-200 flex items-center">
-            <i class="fas fa-user-circle mr-1"></i> Akun
-          </a>
-          <div class="border-l pl-4 border-blue-400">
-            <a href="login.html" class="hover:text-blue-200 transition-colors duration-200 mr-4">
-              <i class="fas fa-sign-in-alt mr-1"></i> Login
+          <div class="flex items-center space-x-3">
+            <a href="login.html" class="glass text-white px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 magnetic">
+              <i class="fas fa-sign-in-alt mr-2"></i> Login
             </a>
-            <a href="register.html" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-lg font-medium hover:bg-yellow-300 transition-all">
-              <i class="fas fa-user-plus mr-1"></i> Sign Up
+            <a href="register.html" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-6 py-2 rounded-lg font-semibold btn-modern hover:shadow-lg transform hover:scale-105 transition-all duration-300 magnetic">
+              <i class="fas fa-user-plus mr-2"></i> Sign Up
             </a>
           </div>
         </div>
         
-        <!-- Mobile menu button -->
         <div class="md:hidden">
           <button id="menuBtn" class="text-white focus:outline-none">
             <i class="fas fa-bars text-xl"></i>
@@ -201,23 +391,19 @@
         </div>
       </div>
       
-      <!-- Mobile Menu -->
       <div id="mobileMenu" class="md:hidden hidden mobile-menu pb-4">
         <div class="flex flex-col space-y-3">
-          <a href="index.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
+          <a href="#home" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors" onclick="document.getElementById('mobileMenu').classList.add('hidden')">
             <i class="fas fa-home mr-2"></i> Home
           </a>
-          <a href="tryout.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
-            <i class="fas fa-file-alt mr-2"></i> Tryout
+          <a href="#features" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors" onclick="document.getElementById('mobileMenu').classList.add('hidden')">
+            <i class="fas fa-star mr-2"></i> Features
           </a>
-          <a href="materi.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
-            <i class="fas fa-book mr-2"></i> Materi
+          <a href="#subjects" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors" onclick="document.getElementById('mobileMenu').classList.add('hidden')">
+            <i class="fas fa-book mr-2"></i> Subjects
           </a>
-          <a href="paket.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
-            <i class="fas fa-credit-card mr-2"></i> Paket
-          </a>
-          <a href="akun.html" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors">
-            <i class="fas fa-user-circle mr-2"></i> Akun
+          <a href="#packages" class="hover:bg-blue-700 py-2 px-4 rounded-md transition-colors" onclick="document.getElementById('mobileMenu').classList.add('hidden')">
+            <i class="fas fa-credit-card mr-2"></i> Packages
           </a>
           <div class="pt-2 border-t border-blue-400 flex flex-col space-y-2">
             <a href="login.html" class="bg-blue-700 py-2 px-4 rounded-md text-center transition-colors">
@@ -232,65 +418,92 @@
     </div>
   </nav>
 
-  <!-- Hero Section with animated background -->
-  <section class="bg-gradient-blue animate-gradient text-white py-20 relative overflow-hidden">
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
-      <div class="absolute top-20 right-20 w-60 h-60 bg-blue-300 rounded-full opacity-10 animate-float"></div>
-      <div class="absolute bottom-10 left-1/3 w-40 h-40 bg-indigo-400 rounded-full opacity-10" style="animation: float 4s ease-in-out infinite;"></div>
-    </div>
+  <section id="home" class="min-h-screen bg-gradient-hero relative overflow-hidden flex items-center">
+    <div class="particles"></div>
+    <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full opacity-20 animate-morphing"></div>
+    <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-400 rounded-full opacity-10 animate-float" style="animation-delay: 2s;"></div>
+    <div class="absolute top-1/2 left-1/4 w-4 h-4 bg-yellow-300 rounded-full animate-ping"></div>
+    <div class="absolute top-1/3 right-1/3 w-6 h-6 bg-pink-400 rounded-full animate-bounce" style="animation-delay: 1s;"></div>
     
     <div class="container mx-auto px-4 relative z-10">
-      <div class="flex flex-col md:flex-row items-center justify-between">
-        <div class="md:w-1/2 text-center md:text-left" data-aos="fade-right">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">Raih Nilai <span class="text-yellow-300">A++</span> Bersama <br>UNNES STUDY ZONE!</h1>
-          <p class="text-lg mb-8 text-blue-100 max-w-xl">Platform persiapan UTS & UAS Online #1 di Indonesia dengan lebih dari 10,000+ soal latihan berkualitas tinggi yang didesain oleh pakar pendidikan.</p>
-          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
-            <a href="register.html" class="bg-yellow-400 text-blue-900 py-3 px-8 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center">
-              <i class="fas fa-user-plus mr-2"></i> Daftar Gratis
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="text-white">
+          <div class="inline-flex items-center glass px-4 py-2 rounded-full mb-6 animate-slide-up">
+            <span class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+            <span class="text-sm">Platform #1 di Indonesia</span>
+          </div>
+          
+          <h1 class="text-5xl lg:text-7xl font-black mb-6 leading-tight animate-slide-up" style="animation-delay: 0.2s;">
+            Raih Nilai
+            <span class="bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 bg-clip-text text-transparent animate-pulse">
+              A++
+            </span>
+            <br>dengan Mudah!
+          </h1>
+          
+          <p class="text-xl text-blue-100 mb-8 leading-relaxed animate-slide-up" style="animation-delay: 0.4s;">
+            Platform persiapan UTS & UAS online dengan 
+            <span class="text-yellow-300 font-semibold">10,000+ soal berkualitas</span> 
+            yang dirancang khusus untuk mahasiswa Indonesia.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row gap-4 mb-12 animate-slide-up" style="animation-delay: 0.6s;">
+            <a href="materi.html" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-8 py-4 rounded-xl font-bold text-lg btn-modern hover:shadow-2xl transform hover:scale-105 transition-all duration-300 magnetic">
+              <i class="fas fa-rocket mr-2"></i> Mulai Gratis
             </a>
-            <a href="#packages" class="bg-transparent border-2 border-white py-3 px-8 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-all flex items-center justify-center">
-              <i class="fas fa-th-list mr-2"></i> Lihat Paket
-            </a>
+            </div>
+          
+          <div class="flex items-center space-x-8 animate-slide-up" style="animation-delay: 0.8s;">
+            <div class="flex -space-x-2 mr-3">
+              <img class="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face" alt="User 1">
+              <img class="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face" alt="User 2">
+              <img class="w-8 h-8 rounded-full border-2 border-white" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face" alt="User 3">
+            </div>
+            <span class="text-sm text-blue-100">5,000+ mahasiswa aktif</span>
+          </div>
+          <div class="flex items-center">
+            <div class="flex text-yellow-400 mr-2">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <span class="text-sm text-blue-100">4.9/5 rating</span>
           </div>
         </div>
-        <div class="md:w-1/2 mt-10 md:mt-0" data-aos="fade-left">
-          <a href="https://freeimage.host/i/3QQ9jb1"><img src="https://iili.io/3QQ9jb1.md.png" alt="3QQ9jb1.md.png" border="0"  class=" transform hover:scale-105 transition-transform duration-500 animate-float" style="animation-delay: 1s;"></a>
+        
+        <div class="relative animate-slide-up" style="animation-delay: 1s;">
+          <div class="relative">
+            <div class="glass-dark p-8 rounded-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500">
+              <img src="mascot.png" alt="mascot" class="w-full rounded-2xl shadow-2xl">
+            </div>
+          </div>
         </div>
       </div>
       
-      <!-- Quick stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-        <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-center">
-            <div class="text-3xl font-bold mb-1 count-up-value" data-value="10000">10,000+</div>
-            <p class="text-blue-200">Soal Tersedia</p>
-          </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
+        <div class="glass-dark p-6 rounded-2xl text-center text-white transform hover:scale-105 transition-all duration-300" data-observe id="stat1">
+          <div class="text-3xl font-bold mb-2 count-up">0</div>
+          <div class="text-blue-200 text-sm">Soal Tersedia</div>
         </div>
-        <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-center">
-            <div class="text-3xl font-bold mb-1 count-up-value" data-value="50">50+</div>
-            <p class="text-blue-200">Mata Kuliah</p>
-          </div>
+        <div class="glass-dark p-6 rounded-2xl text-center text-white transform hover:scale-105 transition-all duration-300" data-observe id="stat2">
+          <div class="text-3xl font-bold mb-2 count-up">0</div>
+          <div class="text-blue-200 text-sm">Mata Kuliah</div>
         </div>
-        <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg" data-aos="fade-up" data-aos-delay="300">
-          <div class="text-center">
-            <div class="text-3xl font-bold mb-1 count-up-value" data-value="5000">5,000+</div>
-            <p class="text-blue-200">Pengguna Aktif</p>
-          </div>
+        <div class="glass-dark p-6 rounded-2xl text-center text-white transform hover:scale-105 transition-all duration-300" data-observe id="stat3">
+          <div class="text-3xl font-bold mb-2 count-up">0</div>
+          <div class="text-blue-200 text-sm">Pengguna Aktif</div>
         </div>
-        <div class="bg-blue-800 bg-opacity-50 p-4 rounded-lg" data-aos="fade-up" data-aos-delay="400">
-          <div class="text-center">
-            <div class="text-3xl font-bold mb-1 count-up-value" data-value="95">95%</div>
-            <p class="text-blue-200">Tingkat Kepuasan</p>
-          </div>
+        <div class="glass-dark p-6 rounded-2xl text-center text-white transform hover:scale-105 transition-all duration-300" data-observe id="stat4">
+          <div class="text-3xl font-bold mb-2 count-up">0</div>
+          <div class="text-blue-200 text-sm">Tingkat Kepuasan</div>
         </div>
       </div>
     </div>
   </section>
-  
-  <!-- How it Works Section -->
-  <section class="py-16 bg-white">
+
+    <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
       <div class="text-center mb-12">
         <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Bagaimana UNNES STUDY ZONE Bekerja?</h2>
@@ -322,120 +535,151 @@
       </div>
     </div>
   </section>
-  
-  <!-- Feature Highlights Section -->
-  <section class="py-16 bg-gray-100">
+
+  <section id="features" class="py-24 bg-white relative">
     <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Mengapa Memilih UNNES STUDY ZONE?</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Fitur-fitur unggulan yang membantu Anda mencapai nilai terbaik</p>
+      <div class="text-center mb-16">
+        <div class="inline-flex items-center bg-blue-100 text-blue-600 px-4 py-2 rounded-full mb-4">
+          <i class="fas fa-star mr-2"></i>
+          <span class="font-semibold">Fitur Unggulan</span>
+        </div>
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          Mengapa Memilih 
+          <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            UNNES STUDY ZONE?
+          </span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Platform terdepan dengan teknologi AI dan metodologi pembelajaran terbaru
+        </p>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white p-8 rounded-xl shadow-md card-hover" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-blue-500 text-3xl mb-4">
-            <i class="fas fa-tags"></i>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="interactive-card bg-gradient-card p-8 rounded-3xl shadow-lg group">
+          <div class="w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce">
+            <i class="fas fa-tags text-white text-2xl"></i>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Harga Terjangkau</h3>
-          <p class="text-gray-600">Paket mulai dari Rp 5.000 untuk akses tryout berkualitas dengan berbagai metode pembayaran.</p>
-          <ul class="mt-4 space-y-2 text-gray-600">
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Mulai dari Rp 5.000/tryout</span>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">Harga Terjangkau</h3>
+          <p class="text-gray-600 mb-6">Akses premium dengan harga mulai dari Rp 5.000. Investasi terbaik untuk masa depan akademis Anda.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              Mulai dari Rp 5.000/tryout
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Diskon untuk paket bulanan</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              Diskon hingga 50% untuk paket bulanan
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Pembayaran via transfer, e-wallet, dan QRIS</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-green-500 mr-3"></i>
+              Payment gateway terintegrasi
             </li>
           </ul>
         </div>
         
-        <div class="bg-white p-8 rounded-xl shadow-md card-hover" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-blue-500 text-3xl mb-4">
-            <i class="fas fa-award"></i>
+        <div class="interactive-card bg-gradient-card p-8 rounded-3xl shadow-lg group">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce">
+            <i class="fas fa-brain text-white text-2xl"></i>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Konten Berkualitas</h3>
-          <p class="text-gray-600">Soal disusun oleh dosen dan pakar pendidikan dari universitas ternama untuk hasil maksimal.</p>
-          <ul class="mt-4 space-y-2 text-gray-600">
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Disusun oleh pakar pendidikan berpengalaman</span>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">AI-Powered Learning</h3>
+          <p class="text-gray-600 mb-6">Teknologi AI yang menganalisis pola belajar Anda dan memberikan rekomendasi personal.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-blue-500 mr-3"></i>
+              Adaptive learning algorithm
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Update soal secara berkala</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-blue-500 mr-3"></i>
+              Personalized study path
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Sesuai dengan kurikulum terbaru</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-blue-500 mr-3"></i>
+              Smart progress tracking
             </li>
           </ul>
         </div>
         
-        <div class="bg-white p-8 rounded-xl shadow-md card-hover" data-aos="fade-up" data-aos-delay="300">
-          <div class="text-blue-500 text-3xl mb-4">
-            <i class="fas fa-chart-line"></i>
+        <div class="interactive-card bg-gradient-card p-8 rounded-3xl shadow-lg group">
+          <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center mb-6 group-hover:animate-bounce">
+            <i class="fas fa-chart-line text-white text-2xl"></i>
           </div>
-          <h3 class="text-xl font-semibold mb-3">Analisis Performa</h3>
-          <p class="text-gray-600">Dapatkan analisis nilai langsung dan rekomendasi materi untuk perbaikan cepat.</p>
-          <ul class="mt-4 space-y-2 text-gray-600">
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Analisis per topik materi</span>
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">Analytics Dashboard</h3>
+          <p class="text-gray-600 mb-6">Dashboard komprehensif dengan visualisasi data untuk memantau progress belajar Anda.</p>
+          <ul class="space-y-3">
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-purple-500 mr-3"></i>
+              Real-time performance metrics
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Grafik perkembangan nilai</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-purple-500 mr-3"></i>
+              Detailed analytics reports
             </li>
-            <li class="flex items-start">
-              <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
-              <span>Rekomendasi materi untuk dipelajari</span>
+            <li class="flex items-center text-gray-700">
+              <i class="fas fa-check-circle text-purple-500 mr-3"></i>
+              Weakness identification
             </li>
           </ul>
         </div>
       </div>
     </div>
   </section>
-  
-  <!-- Subject List -->
-  <section class="py-16 bg-white">
+
+  <section id="subjects" class="py-24 bg-gray-50">
     <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Mata Kuliah Tersedia</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Pilih dari berbagai mata kuliah sesuai jurusan Anda</p>
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          Mata Kuliah <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Tersedia</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Lebih dari 50 mata kuliah dari berbagai fakultas dan jurusan
+        </p>
       </div>
       
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="100">
-          <i class="fas fa-flag text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Pancasila</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-red-400 to-red-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-flag text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">Pancasila</h3>
         </div>
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="150">
-          <i class="fas fa-language text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Bahasa Indonesia</h3>
+        
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-language text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">Bahasa Indonesia</h3>
         </div>
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="200">
-          <i class="fas fa-calculator text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Matematika</h3>
+        
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-calculator text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">Matematika</h3>
         </div>
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="250">
-          <i class="fas fa-flask text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Kimia</h3>
+        
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-flask text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">Kimia</h3>
         </div>
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="300">
-          <i class="fas fa-database text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Basis Data</h3>
+        
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-database text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">Basis Data</h3>
         </div>
-        <div class="bg-gradient-card p-4 rounded-lg text-center shadow-sm card-hover" data-aos="fade-up" data-aos-delay="350">
-          <i class="fas fa-plus-circle text-blue-500 text-2xl mb-2"></i>
-          <h3 class="font-medium">Dan 45+ Lainnya</h3>
+        
+        <div class="interactive-card bg-white p-6 rounded-2xl shadow-md text-center group">
+          <div class="w-12 h-12 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse">
+            <i class="fas fa-plus-circle text-white"></i>
+          </div>
+          <h3 class="font-semibold text-gray-900">45+ Lainnya</h3>
         </div>
+        
       </div>
-      
+
       <div class="text-center mt-8">
         <a href="materi.html" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
           Lihat Semua Mata Kuliah <i class="fas fa-arrow-right ml-2"></i>
@@ -444,287 +688,653 @@
     </div>
   </section>
 
-  <!-- Packages Section -->
-  <section id="packages" class="py-16 bg-gray-100">
+  <section id="packages" class="py-24 bg-white">
     <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Pilih Paket Sesuai Kebutuhanmu</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Berbagai pilihan paket dengan fitur yang disesuaikan untuk kebutuhan belajarmu</p>
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          Pilih Paket <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Terbaikmu</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Paket fleksibel yang disesuaikan dengan kebutuhan dan budget Anda
+        </p>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover" data-aos="fade-up" data-aos-delay="100">
-          <div class="bg-blue-100 p-6 text-center">
-            <h3 class="text-2xl font-bold text-blue-800">BASIC</h3>
-            <p class="text-blue-600">Untuk coba-coba</p>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="interactive-card bg-gradient-card p-8 rounded-3xl shadow-lg border-2 border-gray-200 hover:border-blue-400 transition-all duration-300">
+          <div class="flex justify-between items-start mb-6">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">Basic</h3>
+                            <p class="text-gray-600">Untuk pemula</p>
+            </div>
+            <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Populer</div>
           </div>
-          <div class="p-8">
-            <div class="flex justify-center items-end mb-6">
-              <span class="text-3xl font-bold text-gray-800">Rp 5.000</span>
+          
+          <div class="mb-8">
+            <div class="flex items-end">
+              <span class="text-4xl font-bold text-gray-900">Rp 5.000</span>
               <span class="text-gray-500 ml-1">/tryout</span>
             </div>
-            <ul class="space-y-3 mb-8">
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Akses 1x Tryout untuk 1 Mata Kuliah</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Pembahasan Soal Dasar</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Hasil Nilai Standar</span>
-              </li>
-              <li class="flex items-start opacity-50">
-                <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
-                <span>Analisis Performa</span>
-              </li>
-              <li class="flex items-start opacity-50">
-                <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
-                <span>Materi Pembelajaran</span>
-              </li>
-            </ul>
-            <a href="paket.html" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-              <i class="fas fa-shopping-cart mr-2"></i> Beli Paket
-            </a>
+            <p class="text-gray-500 text-sm mt-1">Beli 5 tryout dapat gratis 1</p>
           </div>
+          
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Akses 1x Tryout untuk 1 Mata Kuliah</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Pembahasan Soal Dasar</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Hasil Nilai Standar</span>
+            </li>
+            <li class="flex items-start text-gray-400">
+              <i class="fas fa-times-circle mt-1 mr-3"></i>
+              <span>Analisis Performa</span>
+            </li>
+            <li class="flex items-start text-gray-400">
+              <i class="fas fa-times-circle mt-1 mr-3"></i>
+              <span>Materi Pembelajaran</span>
+            </li>
+          </ul>
+          
+          <button class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-xl font-semibold btn-modern hover:shadow-lg magnetic">
+            Pilih Paket
+          </button>
         </div>
         
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden relative transform scale-105 card-hover" data-aos="fade-up" data-aos-delay="200">
-          <div class="absolute top-0 right-0 bg-yellow-400 text-blue-900 px-4 py-1 rounded-bl-lg font-medium">
-            TERPOPULER
+        <div class="interactive-card bg-gradient-to-b from-blue-600 to-blue-800 p-8 rounded-3xl shadow-2xl transform scale-105 relative">
+          <div class="absolute top-0 right-0 bg-yellow-400 text-blue-900 px-4 py-1 rounded-bl-xl rounded-tr-xl font-bold text-sm">
+            BEST VALUE
           </div>
-          <div class="bg-blue-600 p-6 text-center text-white">
-            <h3 class="text-2xl font-bold">PREMIUM</h3>
+          
+          <div class="mb-6">
+            <h3 class="text-2xl font-bold text-white">Premium</h3>
             <p class="text-blue-100">Untuk persiapan maksimal</p>
           </div>
-          <div class="p-8">
-            <div class="flex justify-center items-end mb-6">
-              <span class="text-3xl font-bold text-gray-800">Rp 15.000</span>
-              <span class="text-gray-500 ml-1">/bulan</span>
+          
+          <div class="mb-8">
+            <div class="flex items-end">
+              <span class="text-4xl font-bold text-white" id="premiumPrice">Rp 15.000</span>
+              <span class="text-blue-200 ml-1" id="premiumDuration">/bulan</span>
             </div>
-            <ul class="space-y-3 mb-8">
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Akses ke Semua Tryout</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Pembahasan Soal Lengkap</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Analisis Performa Detail</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Akses Materi Pembelajaran</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Prioritas Dukungan Pelanggan</span>
-              </li>
-            </ul>
-            <a href="paket.html" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-              <i class="fas fa-shopping-cart mr-2"></i> Beli Paket
+            <p class="text-blue-200 text-sm mt-1">Hanya Rp 500/hari</p>
+          </div>
+          
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+              <span class="text-white">Akses ke Semua Tryout</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+              <span class="text-white">Pembahasan Soal Lengkap</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+              <span class="text-white">Analisis Performa Detail</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+              <span class="text-white">Akses Materi Pembelajaran</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-yellow-400 mt-1 mr-3"></i>
+              <span class="text-white">Prioritas Dukungan Pelanggan</span>
+            </li>
+          </ul>
+          
+          <button class="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 py-3 rounded-xl font-semibold btn-modern hover:shadow-lg magnetic">
+            Pilih Paket
+          </button>
+        </div>
+        
+        <div class="interactive-card bg-gradient-card p-8 rounded-3xl shadow-lg border-2 border-gray-200 hover:border-purple-400 transition-all duration-300">
+          <div class="mb-6">
+            <h3 class="text-2xl font-bold text-gray-900">Group</h3>
+            <p class="text-gray-600">Untuk belajar bersama</p>
+          </div>
+          
+          <div class="mb-8">
+            <div class="flex items-end">
+              <span class="text-4xl font-bold text-gray-900" id="groupPrice">Rp 20.000</span>
+              <span class="text-gray-500 ml-1" id="groupDuration">/tryout</span>
+            </div>
+            <p class="text-gray-500 text-sm mt-1">Untuk 5 orang (Rp 4.000/orang)</p>
+          </div>
+          
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Akses 1x Tryout untuk 5 Orang</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Pembahasan Soal Dasar</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Hasil Nilai Standar</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+              <span>Diskon untuk Kelompok</span>
+            </li>
+            <li class="flex items-start text-gray-400">
+              <i class="fas fa-times-circle mt-1 mr-3"></i>
+              <span>Analisis Performa</span>
+            </li>
+          </ul>
+          
+          <button class="w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 rounded-xl font-semibold btn-modern hover:shadow-lg magnetic">
+            Pilih Paket
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 bg-gray-50">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          Apa Kata <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Mereka?</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Testimoni dari mahasiswa yang telah merasakan manfaat UNNES STUDY ZONE
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="interactive-card bg-white p-8 rounded-3xl shadow-lg">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+              <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Diana Putri testimonial avatar" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900">Diana Putri</h4>
+              <p class="text-gray-500 text-sm">Mahasiswa Teknik Informatika</p>
+            </div>
+          </div>
+          <div class="flex mb-4 text-yellow-400">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p class="text-gray-700 italic">
+            "Berhasil dapat nilai A di UAS berkat soal-soal di UNNES STUDY ZONE. Pembahasannya sangat detail dan mudah dipahami!"
+          </p>
+        </div>
+        
+        <div class="interactive-card bg-white p-8 rounded-3xl shadow-lg">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+              <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Rizky Pratama testimonial avatar" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900">Rizky Pratama</h4>
+              <p class="text-gray-500 text-sm">Mahasiswa Ekonomi</p>
+            </div>
+          </div>
+          <div class="flex mb-4 text-yellow-400">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+          </div>
+          <p class="text-gray-700 italic">
+            "Analisis performanya sangat membantu mengetahui kelemahan saya. Sekarang belajar jadi lebih terarah!"
+          </p>
+        </div>
+        
+        <div class="interactive-card bg-white p-8 rounded-3xl shadow-lg">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+              <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Siti Rahayu testimonial avatar" class="w-full h-full object-cover">
+            </div>
+            <div>
+              <h4 class="font-bold text-gray-900">Siti Rahayu</h4>
+              <p class="text-gray-500 text-sm">Mahasiswa Pendidikan</p>
+            </div>
+          </div>
+          <div class="flex mb-4 text-yellow-400">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+          <p class="text-gray-700 italic">
+            "Harga sangat terjangkau untuk kualitas yang diberikan. Paket bulannya worth it banget!"
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          Pertanyaan <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Umum</span>
+        </h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+          Temukan jawaban untuk pertanyaan yang sering diajukan
+        </p>
+      </div>
+      
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="faq-item bg-gray-50 rounded-xl overflow-hidden">
+          <button class="w-full flex justify-between items-center p-6 text-left focus:outline-none">
+            <h3 class="text-lg font-semibold text-gray-900">Apa itu UNNES STUDY ZONE?</h3>
+            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content px-6 pb-6 hidden">
+            <p class="text-gray-600">
+              UNNES STUDY ZONE adalah platform persiapan ujian online dengan ribuan soal latihan, pembahasan, dan analisis performa untuk membantu mahasiswa meraih nilai terbaik dalam UTS dan UAS.
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item bg-gray-50 rounded-xl overflow-hidden">
+          <button class="w-full flex justify-between items-center p-6 text-left focus:outline-none">
+            <h3 class="text-lg font-semibold text-gray-900">Bagaimana cara memulai?</h3>
+            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content px-6 pb-6 hidden">
+            <p class="text-gray-600">
+              Anda cukup mendaftar akun gratis, memilih paket yang sesuai dengan kebutuhan, dan langsung bisa mengakses tryout dan materi pembelajaran kapan saja.
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item bg-gray-50 rounded-xl overflow-hidden">
+          <button class="w-full flex justify-between items-center p-6 text-left focus:outline-none">
+            <h3 class="text-lg font-semibold text-gray-900">Apakah ada uji coba gratis?</h3>
+            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content px-6 pb-6 hidden">
+            <p class="text-gray-600">
+              Ya, kami menyediakan tryout gratis untuk beberapa mata kuliah tertentu. Anda bisa mencoba sebelum memutuskan untuk membeli paket premium.
+            </p>
+          </div>
+        </div>
+        
+        <div class="faq-item bg-gray-50 rounded-xl overflow-hidden">
+          <button class="w-full flex justify-between items-center p-6 text-left focus:outline-none">
+            <h3 class="text-lg font-semibold text-gray-900">Metode pembayaran apa saja yang tersedia?</h3>
+            <i class="fas fa-chevron-down text-blue-600 transition-transform duration-300"></i>
+          </button>
+          <div class="faq-content px-6 pb-6 hidden">
+            <p class="text-gray-600">
+              Kami menerima berbagai metode pembayaran termasuk transfer bank (BCA, Mandiri, BRI, BNI), e-wallet (OVO, GoPay, Dana, ShopeePay), dan QRIS.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24 bg-gradient-hero text-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+        Siap Raih Nilai <span class="bg-gradient-to-r from-yellow-300 to-yellow-400 bg-clip-text text-transparent">Terbaikmu?</span>
+      </h2>
+      <p class="text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+        Bergabunglah dengan 5,000+ mahasiswa lainnya yang telah merasakan manfaat UNNES STUDY ZONE
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="register.html" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-blue-900 px-8 py-4 rounded-xl font-bold text-lg btn-modern hover:shadow-2xl transform hover:scale-105 transition-all duration-300 magnetic">
+          <i class="fas fa-rocket mr-2"></i> Daftar Sekarang
+        </a>
+        <button id="openQaBotBtn" class="glass px-8 py-4 rounded-xl font-semibold text-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 magnetic">
+          <i class="fas fa-question-circle mr-2"></i> Butuh Bantuan?
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center mr-3">
+              <img src="logo.png" alt="Logo" class="w-8 h-8">
+            </div>
+            <span class="text-xl font-bold">UNNES STUDY ZONE</span>
+          </div>
+          <p class="text-gray-400 mb-4">
+            Platform persiapan UTS & UAS Online #1 di Indonesia untuk mahasiswa.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-youtube text-xl"></i>
             </a>
           </div>
         </div>
         
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover" data-aos="fade-up" data-aos-delay="300">
-          <div class="bg-blue-100 p-6 text-center">
-            <h3 class="text-2xl font-bold text-blue-800">GROUP</h3>
-            <p class="text-blue-600">Untuk belajar bersama</p>
-          </div>
-          <div class="p-8">
-            <div class="flex justify-center items-end mb-6">
-              <span class="text-3xl font-bold text-gray-800">Rp 20.000</span>
-              <span class="text-gray-500 ml-1">/tryout</span>
-            </div>
-            <ul class="space-y-3 mb-8">
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Akses 1x Tryout untuk 5 Orang</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Pembahasan Soal Dasar</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Hasil Nilai Standar</span>
-              </li>
-              <li class="flex items-start">
-                <i class="fas fa-check-circle text-green-500 mt-1 mr-2"></i>
-                <span>Diskon untuk Kelompok</span>
-              </li>
-              <li class="flex items-start opacity-50">
-                <i class="fas fa-times-circle text-red-500 mt-1 mr-2"></i>
-                <span>Analisis Performa</span>
-              </li>
-            </ul>
-            <a href="paket.html" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-              <i class="fas fa-shopping-cart mr-2"></i> Beli Paket
-            </a>
-          </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Menu</h3>
+          <ul class="space-y-3">
+            <li><a href="#home" class="text-gray-400 hover:text-white transition-colors duration-300">Home</a></li>
+            <li><a href="#features" class="text-gray-400 hover:text-white transition-colors duration-300">Features</a></li>
+            <li><a href="#subjects" class="text-gray-400 hover:text-white transition-colors duration-300">Subjects</a></li>
+            <li><a href="#packages" class="text-gray-400 hover:text-white transition-colors duration-300">Packages</a></li>
+            <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors duration-300">Account</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Bantuan</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">FAQ</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kontak Kami</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kebijakan Privasi</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Syarat & Ketentuan</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Kontak</h3>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3"></i>
+              <span>Jl. Pendidikan No. 1, Semarang, Jawa Tengah</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3"></i>
+              <span>hello@unnesstudyzone.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone-alt mt-1 mr-3"></i>
+              <span>(024) 1234 5678</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fab fa-whatsapp mt-1 mr-3"></i>
+              <span>+62 812 3456 7890</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- FAQ Section -->
-  <section class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Pertanyaan yang Sering Diajukan</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Kami menjawab pertanyaan umum untuk membantu Anda memulai</p>
-      </div>
-      <div class="space-y-4 max-w-3xl mx-auto">
-        <div class="bg-gray-100 rounded-lg p-4 card-hover" data-aos="fade-up" data-aos-delay="100">
-          <button class="w-full text-left flex justify-between items-center text-lg font-semibold text-gray-800 focus:outline-none">
-            Apa itu UNNES STUDY ZONE?
-            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
-          </button>
-          <div class="faq-content hidden mt-2 text-gray-600">
-            UNNES STUDY ZONE adalah platform persiapan ujian online dengan ribuan soal latihan, pembahasan, dan analisis performa untuk membantu mahasiswa meraih nilai terbaik.
-          </div>
-        </div>
-        <div class="bg-gray-100 rounded-lg p-4 card-hover" data-aos="fade-up" data-aos-delay="200">
-          <button class="w-full text-left flex justify-between items-center text-lg font-semibold text-gray-800 focus:outline-none">
-            Bagaimana cara memulai?
-            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
-          </button>
-          <div class="faq-content hidden mt-2 text-gray-600">
-            Daftar akun gratis, pilih paket yang sesuai, dan mulai akses tryout serta materi belajar kapan saja.
-          </div>
-        </div>
-        <div class="bg-gray-100 rounded-lg p-4 card-hover" data-aos="fade-up" data-aos-delay="300">
-          <button class="w-full text-left flex justify-between items-center text-lg font-semibold text-gray-800 focus:outline-none">
-            Apakah ada uji coba gratis?
-            <i class="fas fa-chevron-down transform transition-transform duration-300"></i>
-          </button>
-          <div class="faq-content hidden mt-2 text-gray-600">
-            Ya, kami menawarkan tryout gratis untuk mata kuliah tertentu. Daftar sekarang untuk mencoba!
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Newsletter Subscription Section -->
-  <section class="py-16 bg-gradient-blue text-white">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">Berlangganan Newsletter Kami</h2>
-      <p class="text-blue-100 mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Dapatkan update terbaru tentang soal, promo, dan tips belajar langsung ke email Anda.</p>
-      <form id="newsletterForm" class="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-lg mx-auto" data-aos="fade-up" data-aos-delay="200">
-        <input type="email" placeholder="Masukkan email Anda" class="w-full sm:w-2/3 p-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-yellow-400" required>
-        <button type="submit" class="bg-yellow-400 text-blue-900 py-3 px-6 rounded-lg font-semibold hover:bg-yellow-300 transition-all flex items-center">
-          <i class="fas fa-envelope mr-2"></i> Berlangganan
-        </button>
-      </form>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-6">
-    <div class="container mx-auto px-4 text-center">
-      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 UNNES STUDY ZONE. All rights reserved.</p>
-      <div class="flex justify-center space-x-4">
-        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
-        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+      
+      <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+        <p>© 2025 UNNES STUDY ZONE. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- Back-to-Top Button -->
-  <button id="backToTop" class="fixed bottom-5 right-5 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all back-to-top hidden">
+  <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-all duration-300 opacity-0 invisible magnetic">
     <i class="fas fa-arrow-up"></i>
   </button>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <div id="qaBotContainer">
+      <div id="qaBotHeader">
+          <span>UNNES STUDY ZONE Support</span>
+          <button id="closeQaBotBtn" class="text-white text-lg">&times;</button>
+      </div>
+      <div id="qaBotMessages">
+          <div class="qa-message bot">Halo! Ada yang bisa saya bantu? Silakan ketik pertanyaan Anda (contoh: harga, kontak, uji coba).</div>
+      </div>
+      <div id="qaBotInputContainer">
+          <input type="text" id="qaBotInput" placeholder="Ketik pertanyaan Anda...">
+          <button id="qaBotSendBtn"><i class="fas fa-paper-plane"></i></button>
+      </div>
+  </div>
+
   <script>
-    // Initialize AOS
-    AOS.init({ duration: 800, once: true });
-
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      menuBtn.querySelector('i').classList.toggle('fa-bars');
-      menuBtn.querySelector('i').classList.toggle('fa-times');
-    });
-
-    // Scroll progress bar
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
-    });
-
-    // Back-to-top button
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTop.classList.remove('hidden');
-      } else {
-        backToTop.classList.add('hidden');
-      }
-    });
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // FAQ toggle
-    document.querySelectorAll('.faq-content').forEach(content => {
-      content.previousElementSibling.addEventListener('click', () => {
-        content.classList.toggle('hidden');
-        const chevron = content.previousElementSibling.querySelector('i');
-        chevron.classList.toggle('rotate-180');
-      });
-    });
-
-    // Newsletter form submission
-    document.getElementById('newsletterForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-      toastMessage.textContent = 'Berhasil berlangganan newsletter!';
-      toast.classList.remove('hidden');
+    // Initialize animations and interactive elements when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      // Hide loading screen
       setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 3000);
-      e.target.reset();
-    });
-
-    // Show loading spinner on page transition
-    document.querySelectorAll('a[href]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
-          document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('loadingScreen').classList.add('hidden');
+      }, 1000);
+      
+      // Mobile menu toggle
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      menuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        menuBtn.querySelector('i').classList.toggle('fa-bars');
+        menuBtn.querySelector('i').classList.toggle('fa-times');
+      });
+      
+      // FAQ accordion
+      document.querySelectorAll('.faq-item button').forEach(button => {
+        button.addEventListener('click', () => {
+          const content = button.nextElementSibling;
+          const icon = button.querySelector('i');
+          
+          content.classList.toggle('hidden');
+          icon.classList.toggle('rotate-180');
+        });
+      });
+      
+      // Removed Pricing toggle logic as per client's request (no yearly pricing)
+      // const monthlyToggle = document.getElementById('monthlyToggle');
+      // const yearlyToggle = document.getElementById('yearlyToggle');
+      
+      // monthlyToggle.addEventListener('click', () => {
+      //   monthlyToggle.classList.add('bg-white', 'shadow');
+      //   yearlyToggle.classList.remove('bg-white', 'shadow');
+      //   // Update pricing display here
+      // });
+      
+      // yearlyToggle.addEventListener('click', () => {
+      //   yearlyToggle.classList.add('bg-white', 'shadow');
+      //   monthlyToggle.classList.remove('bg-white', 'shadow');
+      //   // Update pricing display here
+      // });
+      
+      // Navbar scroll effect
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+          navbar.classList.add('scrolled', 'shadow-lg');
+        } else {
+          navbar.classList.remove('scrolled', 'shadow-lg');
         }
       });
-    });
-
-    // Count-up animation for stats
-    document.querySelectorAll('.count-up-value').forEach(element => {
-      const target = parseInt(element.getAttribute('data-value'));
-      let current = 0;
-      const increment = Math.ceil(target / 50);
-      const updateCount = () => {
-        current += increment;
-        if (current >= target) {
-          current = target;
-          element.textContent = target.toLocaleString() + (element.getAttribute('data-value').includes('%') ? '%' : '+');
-          return;
+      
+      // Scroll progress
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / docHeight) * 100;
+        document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+        
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        if (scrollTop > 300) {
+          backToTop.classList.remove('opacity-0', 'invisible');
+          backToTop.classList.add('opacity-100', 'visible');
+        } else {
+          backToTop.classList.remove('opacity-100', 'visible');
+          backToTop.classList.add('opacity-0', 'invisible');
         }
-        element.textContent = current.toLocaleString() + '+';
-        setTimeout(updateCount, 20);
-      };
-      updateCount();
+      });
+      
+      // Back to top button
+      document.getElementById('backToTop').addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+      
+      // Count-up animation for stats
+      function animateValue(id, start, end, duration) {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          const value = Math.floor(progress * (end - start) + start);
+          obj.querySelector('.count-up').innerHTML = value.toLocaleString() + (id === 'stat4' ? '%' : '+');
+          if (progress < 1) {
+            window.requestAnimationFrame(step);
+          }
+        };
+        window.requestAnimationFrame(step);
+      }
+      
+      // Intersection Observer for animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (entry.target.id === 'stat1') animateValue('stat1', 0, 10000, 2000);
+            if (entry.target.id === 'stat2') animateValue('stat2', 0, 50, 1000);
+            if (entry.target.id === 'stat3') animateValue('stat3', 0, 5000, 2000);
+            if (entry.target.id === 'stat4') animateValue('stat4', 0, 95, 1500);
+            
+            // Add animation classes when elements come into view
+            entry.target.classList.add('animate-slide-up');
+            // Unobserve after animation if it's a one-time animation
+            observer.unobserve(entry.target); 
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      // Observe elements that need animation - now targeting parents with IDs
+      document.querySelectorAll('#stat1, #stat2, #stat3, #stat4').forEach(el => {
+        observer.observe(el);
+      });
+      
+      // Create particles
+      const particlesContainer = document.querySelector('.particles');
+      if (particlesContainer) {
+        for (let i = 0; i < 20; i++) {
+          const particle = document.createElement('div');
+          particle.classList.add('particle');
+          
+          // Random properties
+          const size = Math.random() * 5 + 3;
+          const posX = Math.random() * 100;
+          const duration = Math.random() * 10 + 10;
+          const delay = Math.random() * 5;
+          
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${posX}%`;
+          particle.style.animationDuration = `${duration}s`;
+          particle.style.animationDelay = `${delay}s`;
+          
+          particlesContainer.appendChild(particle);
+        }
+      }
+
+      // Magnetic effect for elements with .magnetic class
+      document.querySelectorAll('.magnetic').forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+          const rect = el.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+
+          const moveX = (x - centerX) / centerX * 15; // Max 15px movement
+          const moveY = (y - centerY) / centerY * 15;
+
+          el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = `translate(0px, 0px)`;
+        });
+      });
+
+      // Q&A Bot functionality
+      const qaBotContainer = document.getElementById('qaBotContainer');
+      const openQaBotBtn = document.getElementById('openQaBotBtn');
+      const closeQaBotBtn = document.getElementById('closeQaBotBtn');
+      const qaBotMessages = document.getElementById('qaBotMessages');
+      const qaBotInput = document.getElementById('qaBotInput');
+      const qaBotSendBtn = document.getElementById('qaBotSendBtn');
+
+      openQaBotBtn.addEventListener('click', () => {
+          qaBotContainer.classList.add('open');
+      });
+
+      closeQaBotBtn.addEventListener('click', () => {
+          qaBotContainer.classList.remove('open');
+      });
+
+      function addMessage(message, sender) {
+          const messageDiv = document.createElement('div');
+          messageDiv.classList.add('qa-message', sender);
+          messageDiv.textContent = message;
+          qaBotMessages.appendChild(messageDiv);
+          qaBotMessages.scrollTop = qaBotMessages.scrollHeight; // Scroll to bottom
+      }
+
+      function getBotResponse(userMessage) {
+          const lowerCaseMessage = userMessage.toLowerCase();
+          let botResponse = "Maaf, saya tidak memahami pertanyaan Anda. Silakan coba pertanyaan lain seperti 'harga', 'kontak', atau 'uji coba'.";
+
+          if (lowerCaseMessage.includes('harga') || lowerCaseMessage.includes('price') || lowerCaseMessage.includes('paket')) {
+              botResponse = "Kami memiliki paket Basic (Rp 5.000/tryout), Premium (Rp 15.000/bulan), dan Group (Rp 20.000/tryout untuk 5 orang). Tidak ada paket tahunan untuk Premium/Group saat ini.";
+          } else if (lowerCaseMessage.includes('kontak') || lowerCaseMessage.includes('hubung') || lowerCaseMessage.includes('telepon')) {
+              botResponse = "Anda bisa menghubungi kami melalui email: hello@unnesstudyzone.com atau telepon: (024) 1234 5678, atau WhatsApp: +62 812 3456 7890.";
+          } else if (lowerCaseMessage.includes('uji coba') || lowerCaseMessage.includes('trial') || lowerCaseMessage.includes('gratis')) {
+              botResponse = "Ya, kami menyediakan tryout gratis untuk beberapa mata kuliah tertentu agar Anda bisa mencoba platform kami.";
+          } else if (lowerCaseMessage.includes('akun') || lowerCaseMessage.includes('daftar') || lowerCaseMessage.includes('login')) {
+              botResponse = "Anda bisa mendaftar akun gratis atau login melalui tombol 'Sign Up'/'Login' di navigasi atas atau tombol 'Daftar Sekarang' di bagian bawah halaman.";
+          } else if (lowerCaseMessage.includes('fitur') || lowerCaseMessage.includes('unggulan')) {
+              botResponse = "Fitur unggulan kami meliputi harga terjangkau, AI-Powered Learning untuk rekomendasi personal, dan Analytics Dashboard untuk memantau progres belajar Anda.";
+          } else if (lowerCaseMessage.includes('mata kuliah') || lowerCaseMessage.includes('subjek')) {
+              botResponse = "Kami memiliki lebih dari 50 mata kuliah yang tersedia. Anda bisa melihat daftarnya di bagian 'Subjects' atau klik 'Lihat Semua Mata Kuliah'.";
+          }
+
+          return botResponse;
+      }
+
+      qaBotSendBtn.addEventListener('click', () => {
+          const userMessage = qaBotInput.value.trim();
+          if (userMessage) {
+              addMessage(userMessage, 'user');
+              qaBotInput.value = '';
+              setTimeout(() => {
+                  const botResponse = getBotResponse(userMessage);
+                  addMessage(botResponse, 'bot');
+              }, 500); // Simulate bot typing delay
+          }
+      });
+
+      qaBotInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+              qaBotSendBtn.click();
+          }
+      });
     });
   </script>
 </body>

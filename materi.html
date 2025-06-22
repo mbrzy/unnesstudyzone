@@ -3,18 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Materi Belajar - UNNES STUDY ZONE</title>
+  <title>Materi - UNNES STUDY ZONE</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
     body {
       font-family: 'Poppins', sans-serif;
       scroll-behavior: smooth;
+      /* Set padding-top based on navbar-height, ensuring content doesn't go under fixed navbar */
+      padding-top: var(--navbar-height, 90px); 
+    }
+    nav {
+        font-family: 'Inter', sans-serif;
+    }
+    /* Ensure the navbar has a defined height */
+    nav#navbar {
+      height: var(--navbar-height, 90px);
     }
     
     /* Modern gradient backgrounds */
@@ -26,55 +36,45 @@
       background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     }
     
+    /* Initial gradient for the navbar from new.html */
+    .bg-gradient-hero-nav {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
+    }
+
     /* Custom animations */
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-10px); }
     }
-    
-    .animate-float {
-      animation: float 3s ease-in-out infinite;
-    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
     
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    
     .animate-gradient {
       background-size: 200% 200%;
       animation: gradientShift 5s ease infinite;
     }
     
     /* Modern card hover effects */
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    
+    .card-hover { transition: all 0.3s ease; }
     .card-hover:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
     
     /* Loading spinner animation */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .loading-spinner {
-      animation: spin 1s linear infinite;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-spinner { animation: spin 1s linear infinite; }
     
     /* Toast notification animation */
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
-    
-    .toast {
-      animation: slideIn 0.3s ease-out forwards;
-    }
+    .toast { animation: slideIn 0.3s ease-out forwards; }
     
     /* Scroll progress indicator */
     .progress-bar {
@@ -89,31 +89,41 @@
     }
     
     /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #3b82f6;
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #2563eb;
-    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
     
     /* Back-to-top button */
-    .back-to-top {
-      transition: opacity 0.3s ease, transform 0.3s ease;
+    .back-to-top { transition: opacity 0.3s ease, transform 0.3s ease; }
+    .back-to-top.hidden { opacity: 0; transform: translateY(20px); }
+
+    /* For lesson content accordion */
+    .lesson-content.hidden {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
     }
-    
-    .back-to-top.hidden {
-      opacity: 0;
-      transform: translateY(20px);
+    .lesson-content.visible {
+        max-height: 1000px; /* Arbitrary large value for smooth transition */
+        transition: max-height 0.5s ease-in;
+    }
+    .rotate-180 { transform: rotate(180deg); }
+
+    /* Navbar scrolled state */
+    nav#navbar.scrolled {
+      background: rgba(15, 23, 42, 0.9); /* bg-slate-900 with higher opacity */
+      backdrop-filter: blur(10px);
+    }
+
+    /* Mobile menu specific styles */
+    #mobileMenu {
+      z-index: 40; /* Ensure mobile menu is below the navbar itself but above other content */
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%); /* Same as navbar initial background */
+    }
+    #mobileMenu a {
+      color: white;
+      display: block;
     }
   </style>
 </head>
@@ -121,7 +131,7 @@
   <!-- Progress bar for scroll indicator -->
   <div class="progress-bar" id="scrollProgress"></div>
 
-  <!-- Loading spinner -->
+  <!-- Loading spinner (hidden by default, shown on page transitions) -->
   <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full loading-spinner"></div>
   </div>
@@ -130,18 +140,21 @@
   <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
     <div class="flex items-center">
       <i class="fas fa-check-circle mr-2"></i>
-      <span id="toastMessage">Operasi berhasil!</span>
+      <span id="toastMessage">Materi telah ditandai selesai!</span>
     </div>
   </div>
 
   <!-- Navigation -->
-  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+  <!-- Corrected: Changed 'sticky' to 'fixed' for consistent top positioning.
+       Ensured 'bg-gradient-hero-nav' is the default background.
+       'scrolled' class will now correctly apply its transparent background and blur. -->
+  <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-gradient-hero-nav text-white shadow-lg" id="navbar">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold flex items-center">
-            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
-            <a href="index.html" class="hover:opacity-80 transition-opacity">UNNES STUDY ZONE</a>
+          <div class="bg-yellow-300 rounded-lg flex items-center justify-center font-bold flex items-center">
+            <img src="logo.png" alt="Logo" class="w-8 h-8">
+            <a href="index.html" class="hover:opacity-80 transition-opacity text-xl text-blue-900">UNNES STUDY ZONE</a>
           </div>
         </div>
         
@@ -211,7 +224,7 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero Section Materi -->
   <section class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden">
     <div class="absolute inset-0 overflow-hidden">
       <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
@@ -220,126 +233,244 @@
     </div>
     
     <div class="container mx-auto px-4 relative z-10 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Jelajahi Materi Belajar Kami</h1>
-      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Akses materi berkualitas tinggi yang disusun oleh pakar pendidikan untuk mendukung persiapan ujian Anda.</p>
-      <a href="#subjects" class="bg-yellow-400 text-blue-900 py-3 px-8 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center mx-auto" data-aos="fade-up" data-aos-delay="200">
-        <i class="fas fa-book-open mr-2"></i> Lihat Materi
-      </a>
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Akses Materi Pembelajaran</h1>
+      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">Temukan ribuan materi kuliah yang terstruktur dan mudah dipahami.</p>
+      <div class="relative w-full max-w-lg mx-auto">
+        <input type="text" placeholder="Cari materi (contoh: Pancasila, Kalkulus)..." class="w-full px-4 py-3 rounded-lg shadow-inner text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
     </div>
   </section>
 
-  <!-- Subject Filter and Search -->
-  <section class="py-8 bg-gray-100 sticky top-16 z-30 shadow-md">
+  <!-- Course Listing Section -->
+  <section id="courseListing" class="py-16 bg-white">
     <div class="container mx-auto px-4">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="w-full sm:w-1/2">
-          <input type="text" id="subjectSearch" placeholder="Cari mata kuliah..." class="w-full p-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-600" data-aos="fade-right">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-10">Mata Kuliah Pilihan</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Course Card 1: Pendidikan Pancasila -->
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl mr-4">
+              <i class="fas fa-flag"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gray-900">Pendidikan Pancasila</h3>
+              <p class="text-gray-600 text-sm">Dasar Negara & Ideologi</p>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-4">Pelajari nilai-nilai dasar Pancasila, sejarah perumusan, dan implementasinya dalam kehidupan berbangsa dan bernegara.</p>
+          <ul class="text-gray-600 text-sm space-y-1 mb-4">
+            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 10 Modul</li>
+            <li><i class="fas fa-video text-blue-500 mr-2"></i> 5 Video Pembelajaran</li>
+            <li><i class="fas fa-file-download text-purple-500 mr-2"></i> 3 Dokumen Penting</li>
+          </ul>
+          <button class="view-course-btn bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full" data-course="pancasila">
+            <i class="fas fa-eye mr-2"></i> Lihat Materi
+          </button>
         </div>
-        <div class="w-full sm:w-1/4">
-          <select id="subjectFilter" class="w-full p-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-600" data-aos="fade-left">
-            <option value="all">Semua Kategori</option>
-            <option value="social">Ilmu Sosial</option>
-            <option value="science">Ilmu Pengetahuan Alam</option>
-            <option value="language">Bahasa</option>
-            <option value="technology">Teknologi</option>
-          </select>
+
+        <!-- Course Card 2: Kalkulus I -->
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-xl mr-4">
+              <i class="fas fa-calculator"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gray-900">Kalkulus I</h3>
+              <p class="text-gray-600 text-sm">Fungsi, Turunan, dan Integral</p>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-4">Pahami konsep dasar kalkulus, limit, turunan, dan integral serta aplikasinya dalam berbagai bidang ilmu.</p>
+          <ul class="text-gray-600 text-sm space-y-1 mb-4">
+            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 12 Modul</li>
+            <li><i class="fas fa-video text-blue-500 mr-2"></i> 8 Video Pembelajaran</li>
+            <li><i class="fas fa-file-download text-purple-500 mr-2"></i> 5 Latihan Soal</li>
+          </ul>
+          <button class="view-course-btn bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full" data-course="kalkulus">
+            <i class="fas fa-eye mr-2"></i> Lihat Materi
+          </button>
         </div>
+
+        <!-- Course Card 3: Algoritma & Struktur Data -->
+        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white text-xl mr-4">
+              <i class="fas fa-code"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gray-900">Algoritma & Struktur Data</h3>
+              <p class="text-gray-600 text-sm">Dasar Pemrograman Efisien</p>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-4">Pelajari berbagai algoritma dan struktur data fundamental untuk membangun program yang efisien dan optimal.</p>
+          <ul class="text-gray-600 text-sm space-y-1 mb-4">
+            <li><i class="fas fa-check-circle text-green-500 mr-2"></i> 8 Modul</li>
+            <li><i class="fas fa-video text-blue-500 mr-2"></i> 6 Video Pembelajaran</li>
+            <li><i class="fas fa-file-download text-purple-500 mr-2"></i> 4 Project Praktikum</li>
+          </ul>
+          <button class="view-course-btn bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full" data-course="algoritma">
+            <i class="fas fa-eye mr-2"></i> Lihat Materi
+          </button>
+        </div>
+      </div>
+      <div class="text-center mt-10">
+        <a href="materi copy.html">
+        <button class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors">
+            Lihat Semua Mata Kuliah <i class="fas fa-arrow-right ml-2"></i>
+        </button>
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- Subjects List -->
-  <section id="subjects" class="py-16 bg-white">
-    <div class="container mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Daftar Mata Kuliah</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Temukan materi untuk berbagai mata kuliah, lengkap dengan ringkasan, video, dan latihan soal.</p>
+  <!-- Lesson Detail Modal (Simulated) -->
+  <div id="lessonDetailModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-lg shadow-2xl w-full max-w-3xl h-[90vh] flex flex-col relative">
+      <div class="flex justify-between items-center p-4 border-b border-gray-200">
+        <h2 id="lessonModalTitle" class="text-2xl font-bold text-gray-900">Judul Materi</h2>
+        <button id="closeModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
       </div>
-      
-      <div id="subjectList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="100" data-category="social">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-flag text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">Pendidikan Pancasila</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Pelajari nilai-nilai Pancasila, sejarah, dan penerapannya dalam kehidupan sehari-hari.</p>
-          <a href="tryout.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Mulai Belajar <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="150" data-category="language">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-language text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">Bahasa Indonesia</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Kuasai tata bahasa, kosa kata, dan keterampilan menulis.</p>
-          <a href="tryout.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Mulai Belajar <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="200" data-category="science">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-calculator text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">Matematika</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Pelajari konsep aljabar, geometri, dan statistik dengan latihan interaktif.</p>
-          <a href="tryout.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Mulai Belajar <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="250" data-category="science">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-flask text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">Kimia</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Eksplorasi reaksi kimia, stoikiometri, dan kimia organik dengan video penjelasan.</p>
-          <a href="tryout.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Mulai Belajar <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="300" data-category="technology">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-database text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">Basis Data</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Pahami desain database, SQL, dan manajemen data dengan latihan praktis.</p>
-          <a href="tryout.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Mulai Belajar <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="350" data-category="all">
-          <div class="flex items-center mb-4">
-            <i class="fas fa-plus-circle text-blue-500 text-3xl mr-3"></i>
-            <h3 class="text-xl font-semibold">45+ Mata Kuliah Lainnya</h3>
-          </div>
-          <p class="text-gray-600 mb-4">Jelajahi berbagai materi lainnya untuk semua jurusan dan tingkat.</p>
-          <a href="paket.html" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
-            Beli Paket untuk Akses Penuh <i class="fas fa-arrow-right ml-2"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="p-6 overflow-y-auto flex-grow">
+        <!-- Lesson Content Placeholder -->
+        <div id="lessonContentPlaceholder">
+          <h3 class="text-xl font-semibold mb-4">Pendahuluan</h3>
+          <p class="text-gray-700 mb-6 leading-relaxed">
+            Selamat datang di modul ini! Di sini Anda akan mempelajari dasar-dasar [Nama Mata Kuliah/Topik]. Materi ini dirancang untuk memberikan pemahaman komprehensif tentang konsep-konsep kunci yang akan menjadi fondasi bagi pembelajaran Anda selanjutnya.
+          </p>
 
-  <!-- Call-to-Action Section -->
-  <section class="py-16 bg-gradient-blue text-white">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-4" data-aos="fade-up">Siap Tingkatkan Nilaimu?</h2>
-      <p class="text-blue-100 mb-8 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Beli paket sekarang dan dapatkan akses penuh ke semua materi dan tryout kami!</p>
-      <a href="paket.html" class="bg-yellow-400 text-blue-900 py-3 px-8 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center mx-auto" data-aos="fade-up" data-aos-delay="200">
-        <i class="fas fa-shopping-cart mr-2"></i> Pilih Paket Sekarang
-      </a>
+          <h3 class="text-xl font-semibold mb-4">Video Pembelajaran</h3>
+          <div class="aspect-video w-full bg-gray-200 rounded-lg overflow-hidden mb-6 flex items-center justify-center text-gray-500">
+            <i class="fas fa-video text-6xl"></i>
+            <span class="ml-4 text-lg">Video Player Placeholder</span>
+          </div>
+          <!-- You can embed a YouTube video like this: -->
+          <!-- <iframe class="aspect-video w-full rounded-lg mb-6" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+
+          <h3 class="text-xl font-semibold mb-4">Teori & Konsep</h3>
+          <p class="text-gray-700 mb-4 leading-relaxed">
+            [Isi teks materi di sini]. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </p>
+          <img src="https://placehold.co/800x400/F0F4F8/6B7280?text=Diagram+Konsep" alt="Diagram Konsep" class="w-full rounded-lg shadow-md mb-6">
+          <p class="text-gray-700 mb-6 leading-relaxed">
+            [Lanjutkan teks materi]. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
+          </p>
+
+          <h3 class="text-xl font-semibold mb-4">Lampiran & Download</h3>
+          <ul class="space-y-3 mb-6">
+            <li>
+              <a href="javascript:void(0);" onclick="showToastNotification('Mengunduh dokumen...');" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium">
+                <i class="fas fa-file-pdf mr-3 text-2xl"></i> Slide Presentasi Modul 1.pdf
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0);" onclick="showToastNotification('Mengunduh dokumen...');" class="flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium">
+                <i class="fas fa-file-word mr-3 text-2xl"></i> Ringkasan Materi.docx
+              </a>
+            </li>
+          </ul>
+
+          <h3 class="text-xl font-semibold mb-4">Diskusi & Interaktif</h3>
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-md mb-4">
+            <p class="text-blue-800 font-semibold mb-2"><i class="fas fa-comments mr-2"></i> Diskusi: Apa pendapat Anda tentang konsep X?</p>
+            <textarea class="w-full p-2 border rounded-md focus:ring-blue-400 focus:border-blue-400" rows="3" placeholder="Tulis komentar Anda..."></textarea>
+            <button class="mt-2 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors">Kirim Komentar</button>
+          </div>
+
+          <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+            <p class="text-green-800 font-semibold mb-2"><i class="fas fa-question-circle mr-2"></i> Kuis Singkat: Apa ibu kota Indonesia?</p>
+            <label class="block mb-2"><input type="radio" name="quiz1" value="jakarta" class="mr-2"> Jakarta</label>
+            <label class="block mb-2"><input type="radio" name="quiz1" value="bandung" class="mr-2"> Bandung</label>
+            <button class="mt-2 bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors">Periksa Jawaban</button>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 border-t border-gray-200 flex justify-end">
+        <button id="markAsCompletedBtn" class="bg-green-500 text-white py-2 px-5 rounded-lg font-semibold hover:bg-green-600 transition-colors">
+          <i class="fas fa-check-circle mr-2"></i> Tandai Selesai
+        </button>
+      </div>
     </div>
-  </section>
+  </div>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-6">
-    <div class="container mx-auto px-4 text-center">
-      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 UNNES STUDY ZONE. All rights reserved.</p>
-      <div class="flex justify-center space-x-4">
-        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
-        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+  <footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-yellow-300 rounded-lg flex items-center justify-center mr-3">
+              <img src="logo.png" alt="Logo" class="w-8 h-8">
+            </div>
+            <span class="text-xl font-bold">UNNES STUDY ZONE</span>
+          </div>
+          <p class="text-gray-400 mb-4">
+            Platform persiapan UTS & UAS Online #1 di Indonesia untuk mahasiswa.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-youtube text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Menu</h3>
+          <ul class="space-y-3">
+            <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-300">Home</a></li>
+            <li><a href="index.html#features" class="text-gray-400 hover:text-white transition-colors duration-300">Features</a></li>
+            <li><a href="index.html#subjects" class="text-gray-400 hover:text-white transition-colors duration-300">Subjects</a></li>
+            <li><a href="index.html#packages" class="text-gray-400 hover:text-white transition-colors duration-300">Packages</a></li>
+            <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors duration-300">Account</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Bantuan</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">FAQ</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kontak Kami</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kebijakan Privasi</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Syarat & Ketentuan</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Kontak</h3>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3"></i>
+              <span>Jl. Pendidikan No. 1, Semarang, Jawa Tengah</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3"></i>
+              <span>hello@unnesstudyzone.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone-alt mt-1 mr-3"></i>
+              <span>(024) 1234 5678</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fab fa-whatsapp mt-1 mr-3"></i>
+              <span>+62 812 3456 7890</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+        <p>© 2025 UNNES STUDY ZONE. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -349,75 +480,185 @@
     <i class="fas fa-arrow-up"></i>
   </button>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
-    // Initialize AOS
-    AOS.init({ duration: 800, once: true });
-
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      menuBtn.querySelector('i').classList.toggle('fa-bars');
-      menuBtn.querySelector('i').classList.toggle('fa-times');
-    });
-
-    // Scroll progress bar
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
-    });
-
-    // Back-to-top button
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTop.classList.remove('hidden');
-      } else {
-        backToTop.classList.add('hidden');
-      }
-    });
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Subject filter and search
-    const searchInput = document.getElementById('subjectSearch');
-    const filterSelect = document.getElementById('subjectFilter');
-    const subjectList = document.getElementById('subjectList');
-    const subjects = subjectList.getElementsByClassName('card-hover');
-
-    function filterSubjects() {
-      const searchText = searchInput.value.toLowerCase();
-      const selectedCategory = filterSelect.value;
-
-      Array.from(subjects).forEach(subject => {
-        const title = subject.querySelector('h3').textContent.toLowerCase();
-        const category = subject.getAttribute('data-category');
-        const matchesSearch = title.includes(searchText);
-        const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
-
-        if (matchesSearch && matchesCategory) {
-          subject.style.display = 'block';
-        } else {
-          subject.style.display = 'none';
-        }
-      });
+    // --- Global Utility Functions ---
+    function showElement(element) { if (element) element.classList.remove('hidden'); }
+    function hideElement(element) { if (element) element.classList.add('hidden'); }
+    function showToastNotification(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3000);
     }
 
-    searchInput.addEventListener('input', filterSubjects);
-    filterSelect.addEventListener('change', filterSubjects);
+    // --- DOM Elements ---
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuBtn = document.getElementById('menuBtn');
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+    const loadingScreen = document.getElementById('loading');
+    const navbar = document.getElementById('navbar');
 
-    // Show loading spinner on page transition
-    document.querySelectorAll('a[href]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
-          document.getElementById('loading').classList.remove('hidden');
+    const lessonDetailModal = document.getElementById('lessonDetailModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const lessonModalTitle = document.getElementById('lessonModalTitle');
+    const markAsCompletedBtn = document.getElementById('markAsCompletedBtn');
+
+    // --- Data for Courses/Lessons (simplified for prototype) ---
+    const courseData = {
+        'pancasila': {
+            title: 'Pendidikan Pancasila: Dasar Negara & Ideologi',
+            modules: [
+                { id: 'mod1', title: 'Modul 1: Sejarah Perumusan Pancasila', completed: false },
+                { id: 'mod2', title: 'Modul 2: Sila-Sila Pancasila', completed: false },
+                { id: 'mod3', title: 'Modul 3: Pancasila sebagai Ideologi Negara', completed: false }
+            ]
+        },
+        'kalkulus': {
+            title: 'Kalkulus I: Fungsi, Turunan, dan Integral',
+            modules: [
+                { id: 'mod1', title: 'Modul 1: Fungsi dan Limit', completed: false },
+                { id: 'mod2', title: 'Modul 2: Turunan Fungsi', completed: false },
+                { id: 'mod3', title: 'Modul 3: Aplikasi Turunan', completed: false }
+            ]
+        },
+        'algoritma': {
+            title: 'Algoritma & Struktur Data: Dasar Pemrograman Efisien',
+            modules: [
+                { id: 'mod1', title: 'Modul 1: Konsep Dasar Algoritma', completed: false },
+                { id: 'mod2', title: 'Modul 2: Array & Linked List', completed: false },
+                { id: 'mod3', title: 'Modul 3: Sorting & Searching', completed: false }
+            ]
         }
-      });
+    };
+
+    // Keep track of the currently viewed course in the modal
+    let currentModalCourseKey = '';
+
+    // --- Functions for Lesson Modal ---
+    function openLessonModal(courseKey) {
+        currentModalCourseKey = courseKey;
+        const course = courseData[courseKey];
+        if (course) {
+            lessonModalTitle.textContent = course.title;
+            // For prototyping, we'll keep the same placeholder content
+            // In a real app, content would load dynamically based on module/lesson clicked
+            
+            // Update mark as completed state
+            // For a real app, you'd check user progress here.
+            // For prototype, we'll assume the first module's state.
+            const firstModule = course.modules[0]; // Simplified
+            if (firstModule && firstModule.completed) {
+                markAsCompletedBtn.textContent = 'Selesai';
+                markAsCompletedBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                markAsCompletedBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                markAsCompletedBtn.disabled = true;
+            } else {
+                markAsCompletedBtn.textContent = 'Tandai Selesai';
+                markAsCompletedBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                markAsCompletedBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                markAsCompletedBtn.disabled = false;
+            }
+
+            showElement(lessonDetailModal);
+            document.body.classList.add('overflow-hidden'); // Disable scrolling on body
+        }
+    }
+
+    function closeLessonModal() {
+        hideElement(lessonDetailModal);
+        document.body.classList.remove('overflow-hidden'); // Re-enable scrolling
+        currentModalCourseKey = '';
+    }
+
+    function handleMarkAsCompleted() {
+        if (currentModalCourseKey && courseData[currentModalCourseKey]) {
+            // Simulate marking the first module as completed for the prototype
+            const course = courseData[currentModalCourseKey];
+            if (course.modules[0]) {
+                course.modules[0].completed = true; // Mark as completed in data
+            }
+            showToastNotification('Materi telah ditandai selesai!');
+            // Update button state immediately
+            markAsCompletedBtn.textContent = 'Selesai';
+            markAsCompletedBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+            markAsCompletedBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+            markAsCompletedBtn.disabled = true;
+        }
+    }
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mobile menu toggle
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuBtn.querySelector('i').classList.toggle('fa-bars');
+                menuBtn.querySelector('i').classList.toggle('fa-times');
+            });
+        }
+
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (docHeight > 0) ? (scrollTop / docHeight) * 100 : 0;
+            scrollProgress.style.width = scrollPercent + '%';
+        });
+
+        // Back-to-top button
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.remove('hidden');
+            } else {
+                backToTop.classList.add('hidden');
+            }
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Open lesson modal
+        document.querySelectorAll('.view-course-btn').forEach(button => {
+            button.addEventListener('click', (event) => {
+                const courseKey = event.target.dataset.course;
+                openLessonModal(courseKey);
+            });
+        });
+
+        // Close lesson modal
+        closeModalBtn.addEventListener('click', closeLessonModal);
+        lessonDetailModal.addEventListener('click', (event) => {
+            if (event.target === lessonDetailModal) { // Close if clicked outside the modal content
+                closeLessonModal();
+            }
+        });
+
+        // Mark as completed button
+        markAsCompletedBtn.addEventListener('click', handleMarkAsCompleted);
+
+        // Show loading spinner on page transition for external links (not hash links)
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.includes('whatsapp') && !href.includes('instagram') && !href.includes('twitter') && !href.includes('facebook') && !href.includes('youtube')) {
+                    if (loadingScreen) {
+                        loadingScreen.classList.remove('hidden');
+                    }
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        // Moved this to the end of DOMContentLoaded to ensure elements are present
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled', 'shadow-lg');
+            } else {
+                navbar.classList.remove('scrolled', 'shadow-lg');
+            }
+        });
     });
   </script>
 </body>

@@ -6,15 +6,23 @@
   <title>Tryout - UNNES STUDY ZONE</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
     body {
       font-family: 'Poppins', sans-serif;
       scroll-behavior: smooth;
+      padding-top: var(--navbar-height, 90px); /* Adjust for fixed navbar */
+    }
+    nav {
+        font-family: 'Inter', sans-serif;
+    }
+    nav#navbar {
+      height: var(--navbar-height, 90px);
     }
     
     /* Modern gradient backgrounds */
@@ -25,56 +33,46 @@
     .bg-gradient-card {
       background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
     }
+
+    /* Initial gradient for the navbar from new.html */
+    .bg-gradient-hero-nav {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
+    }
     
     /* Custom animations */
     @keyframes float {
       0%, 100% { transform: translateY(0px); }
       50% { transform: translateY(-10px); }
     }
-    
-    .animate-float {
-      animation: float 3s ease-in-out infinite;
-    }
+    .animate-float { animation: float 3s ease-in-out infinite; }
     
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    
     .animate-gradient {
       background-size: 200% 200%;
       animation: gradientShift 5s ease infinite;
     }
     
     /* Modern card hover effects */
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    
+    .card-hover { transition: all 0.3s ease; }
     .card-hover:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
     
     /* Loading spinner animation */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .loading-spinner {
-      animation: spin 1s linear infinite;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-spinner { animation: spin 1s linear infinite; }
     
     /* Toast notification animation */
     @keyframes slideIn {
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
-    
-    .toast {
-      animation: slideIn 0.3s ease-out forwards;
-    }
+    .toast { animation: slideIn 0.3s ease-out forwards; }
     
     /* Scroll progress indicator */
     .progress-bar {
@@ -89,36 +87,32 @@
     }
     
     /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #3b82f6;
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: #2563eb;
-    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
     
     /* Back-to-top button */
-    .back-to-top {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    
-    .back-to-top.hidden {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    
+    .back-to-top { transition: opacity 0.3s ease, transform 0.3s ease; }
+    .back-to-top.hidden { opacity: 0; transform: translateY(20px); }
+
     /* Progress tracker */
-    .progress-tracker {
-      transition: width 0.3s ease;
+    .progress-tracker { transition: width 0.3s ease; }
+
+    /* Navbar scrolled state */
+    nav#navbar.scrolled {
+      background: rgba(15, 23, 42, 0.9); /* bg-slate-900 with higher opacity */
+      backdrop-filter: blur(10px);
+    }
+
+    /* Mobile menu specific styles */
+    #mobileMenu {
+      z-index: 40; /* Ensure mobile menu is below the navbar itself but above other content */
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%); /* Same as navbar initial background */
+    }
+    #mobileMenu a {
+      color: white;
+      display: block;
     }
   </style>
 </head>
@@ -126,7 +120,7 @@
   <!-- Progress bar for scroll indicator -->
   <div class="progress-bar" id="scrollProgress"></div>
 
-  <!-- Loading spinner -->
+  <!-- Loading spinner (hidden by default, shown on page transitions) -->
   <div id="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full loading-spinner"></div>
   </div>
@@ -135,17 +129,17 @@
   <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
     <div class="flex items-center">
       <i class="fas fa-check-circle mr-2"></i>
-      <span id="toastMessage">Jawaban berhasil disimpan!</span>
+      <span id="toastMessage">Progres berhasil disimpan!</span>
     </div>
   </div>
 
-  <!-- Navigation -->
-  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+  <!-- Navigation (Copied from materi.html) -->
+  <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-gradient-hero-nav text-white shadow-lg" id="navbar">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold flex items-center">
-            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
+          <div class="rounded-lg bg-yellow-300 text-2xl font-bold text-blue-900 flex items-center">
+            <img src="logo.png" alt="Logo" class="w-8 h-8">
             <a href="index.html" class="hover:opacity-80 transition-opacity">UNNES STUDY ZONE</a>
           </div>
         </div>
@@ -216,8 +210,32 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden">
+  <!-- Subject Selection Section -->
+  <section id="subjectSelection" class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden flex items-center justify-center min-h-[calc(100vh-90px)]">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
+      <div class="absolute top-20 right-20 w-60 h-60 bg-blue-300 rounded-full opacity-10 animate-float"></div>
+      <div class="absolute bottom-10 left-1/3 w-40 h-40 bg-indigo-400 rounded-full opacity-10" style="animation: float 4s ease-in-out infinite;"></div>
+    </div>
+    <div class="container mx-auto px-4 relative z-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-6">Pilih Mata Pelajaran Tryout</h1>
+      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">Pilih mata pelajaran yang ingin Anda uji untuk memulai tryout.</p>
+      
+      <div class="relative inline-block text-left w-full max-w-md mx-auto">
+        <select id="subjectSelect" class="block w-full px-4 py-3 bg-white text-gray-800 rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">-- Pilih Mata Pelajaran --</option>
+          <!-- Options will be populated by JavaScript -->
+        </select>
+      </div>
+
+      <button id="startTryoutBtn" class="mt-8 bg-yellow-400 text-blue-900 py-3 px-8 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 hidden">
+        <i class="fas fa-play-circle mr-2"></i> Mulai Tryout
+      </button>
+    </div>
+  </section>
+
+  <!-- Hero Section for Tryout (Initially Hidden) -->
+  <section id="tryoutHero" class="bg-gradient-blue animate-gradient text-white py-16 relative overflow-hidden hidden">
     <div class="absolute inset-0 overflow-hidden">
       <div class="absolute -top-20 -left-20 w-40 h-40 bg-blue-400 rounded-full opacity-10"></div>
       <div class="absolute top-20 right-20 w-60 h-60 bg-blue-300 rounded-full opacity-10 animate-float"></div>
@@ -225,9 +243,9 @@
     </div>
     
     <div class="container mx-auto px-4 relative z-10 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4" data-aos="fade-up">Tryout Pendidikan Pancasila</h1>
-      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Uji kemampuan Anda dengan soal-soal berkualitas tinggi dan dapatkan hasil serta pembahasan instan.</p>
-      <div class="flex items-center justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4"><span id="tryoutSubjectTitle"></span> Tryout</h1>
+      <p class="text-lg mb-8 text-blue-100 max-w-2xl mx-auto">Uji kemampuan Anda dengan soal-soal berkualitas tinggi dan dapatkan hasil serta pembahasan instan.</p>
+      <div class="flex items-center justify-center gap-4">
         <span class="text-xl font-semibold">Waktu Tersisa: <span id="timer">10:00</span></span>
         <button id="saveProgressBtn" class="bg-yellow-400 text-blue-900 py-2 px-4 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105">
           <i class="fas fa-save mr-2"></i> Simpan Progres
@@ -236,250 +254,41 @@
     </div>
   </section>
 
-  <!-- Question Progress Tracker -->
-  <section class="py-8 bg-gray-100 sticky top-16 z-30 shadow-md">
+  <!-- Question Progress Tracker (Initially Hidden) -->
+  <section id="progressTrackerSection" class="py-8 bg-gray-100 sticky top-16 z-30 shadow-md hidden">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between">
         <div class="w-full">
           <div class="h-2 bg-gray-300 rounded-full">
             <div id="questionProgress" class="h-2 bg-blue-600 rounded-full progress-tracker" style="width: 0%;"></div>
           </div>
-          <p class="text-sm text-gray-600 mt-2">Soal: <span id="currentQuestion">0</span>/10</p>
+          <p class="text-sm text-gray-600 mt-2">Soal: <span id="currentQuestion">0</span>/<span id="totalQuestions">10</span></p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Tryout Questions -->
-  <section id="questions" class="py-16 bg-white">
+  <!-- Tryout Questions (Initially Hidden) -->
+  <section id="questionsSection" class="py-16 bg-white hidden">
     <div class="container mx-auto px-4">
-      <div class="space-y-6">
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-lg font-semibold mb-4">1. Apa arti Pancasila sila ke-3?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q1" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Persatuan Indonesia</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q1" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Keadilan Sosial</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q1" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Ketuhanan Yang Maha Esa</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q1" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Kemanusiaan yang Adil dan Beradab</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="150">
-          <h3 class="text-lg font-semibold mb-4">2. Siapa proklamator kemerdekaan Indonesia?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q2" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Soekarno dan Hatta</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q2" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Soedirman dan Diponegoro</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q2" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Bung Tomo dan Sutan Sjahrir</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q2" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Muhammad Hatta dan A. R. Baswedan</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="200">
-          <h3 class="text-lg font-semibold mb-4">3. Apa bunyi sila pertama Pancasila?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q3" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Ketuhanan Yang Maha Esa</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q3" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Kemanusiaan yang Adil dan Beradab</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q3" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Persatuan Indonesia</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q3" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Keadilan Sosial bagi Seluruh Rakyat Indonesia</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="250">
-          <h3 class="text-lg font-semibold mb-4">4. Apa simbol negara Indonesia?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q4" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Garuda Pancasila</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q4" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Bintang Kejora</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q4" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Peta Indonesia</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q4" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Padi dan Kapas</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-lg font-semibold mb-4">5. Siapa tokoh yang mengusulkan Pancasila sebagai dasar negara?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q5" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Soekarno</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q5" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Mohammad Hatta</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q5" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Joko Widodo</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q5" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Sukarno Hatta</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="350">
-          <h3 class="text-lg font-semibold mb-4">6. Apa yang dimaksud dengan Keadilan Sosial?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q6" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Pemerataan ekonomi</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q6" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Pemberdayaan rakyat</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q6" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Persatuan bangsa</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q6" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Keberagaman sosial</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="400">
-          <h3 class="text-lg font-semibold mb-4">7. Pancasila diusulkan pertama kali pada tahun berapa?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q7" value="a" class="mr-2 focus:ring-blue-600">
-              <span>1945</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q7" value="b" class="mr-2 focus:ring-blue-600">
-              <span>1947</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q7" value="c" class="mr-2 focus:ring-blue-600">
-              <span>1940</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q7" value="d" class="mr-2 focus:ring-blue-600">
-              <span>1950</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="450">
-          <h3 class="text-lg font-semibold mb-4">8. Apa tujuan dari Pancasila sebagai dasar negara?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q8" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Untuk mempersatukan bangsa</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q8" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Untuk memperjuangkan kemerdekaan</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q8" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Untuk mendirikan negara</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q8" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Untuk meningkatkan perekonomian</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="500">
-          <h3 class="text-lg font-semibold mb-4">9. Siapa penulis naskah proklamasi kemerdekaan Indonesia?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q9" value="a" class="mr-2 focus:ring-blue-600">
-              <span>Soekarno</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q9" value="b" class="mr-2 focus:ring-blue-600">
-              <span>Sukarno dan Hatta</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q9" value="c" class="mr-2 focus:ring-blue-600">
-              <span>Sutan Sjahrir</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q9" value="d" class="mr-2 focus:ring-blue-600">
-              <span>Mohammad Hatta</span>
-            </label>
-          </div>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="550">
-          <h3 class="text-lg font-semibold mb-4">10. Pada tanggal berapa Indonesia memproklamirkan kemerdekaannya?</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="radio" name="q10" value="a" class="mr-2 focus:ring-blue-600">
-              <span>17 Agustus 1945</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q10" value="b" class="mr-2 focus:ring-blue-600">
-              <span>18 Agustus 1945</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q10" value="c" class="mr-2 focus:ring-blue-600">
-              <span>16 Agustus 1945</span>
-            </label>
-            <label class="flex items-center">
-              <input type="radio" name="q10" value="d" class="mr-2 focus:ring-blue-600">
-              <span>1 Juni 1945</span>
-            </label>
-          </div>
-        </div>
+      <div id="questionsContainer" class="space-y-6">
+        <!-- Questions will be dynamically loaded here -->
       </div>
       <div class="text-center mt-8">
-        <button id="submitBtn" class="bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105" data-aos="fade-up" data-aos-delay="600">
+        <button id="submitBtn" class="bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105">
           <i class="fas fa-paper-plane mr-2"></i> Kirim Jawaban
         </button>
       </div>
     </div>
   </section>
 
-  <!-- Tryout Results -->
+  <!-- Tryout Results (Hidden) -->
   <section id="results" class="py-16 bg-gray-100 hidden">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Hasil Tryout</h2>
-      <div class="bg-white p-6 rounded-lg shadow-md text-center" data-aos="fade-up" data-aos-delay="100">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Hasil Tryout</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center">
         <p class="text-xl font-semibold mb-4">Skor Anda: <span id="score">0</span>/100</p>
-        <p class="text-gray-600 mb-4">Jawaban Benar: <span id="correctAnswers">0</span>/10</p>
+        <p class="text-gray-600 mb-4">Jawaban Benar: <span id="correctAnswers">0</span>/<span id="resultsTotalQuestions">10</span></p>
         <div class="h-4 bg-gray-300 rounded-full">
           <div id="scoreProgress" class="h-4 bg-blue-600 rounded-full progress-tracker" style="width: 0%;"></div>
         </div>
@@ -487,80 +296,115 @@
     </div>
   </section>
 
-  <!-- Explanations -->
+  <!-- Explanations (Hidden) -->
   <section id="explanations" class="py-16 bg-white hidden">
     <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Pembahasan Soal</h2>
-      <div class="space-y-6">
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-lg font-semibold mb-2">1. Apa arti Pancasila sila ke-3?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Persatuan Indonesia</strong></p>
-          <p class="text-gray-600">Penjelasan: Sila ke-3 Pancasila berbunyi "Persatuan Indonesia," yang menekankan pentingnya persatuan dan kesatuan bangsa.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="150">
-          <h3 class="text-lg font-semibold mb-2">2. Siapa proklamator kemerdekaan Indonesia?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Soekarno dan Hatta</strong></p>
-          <p class="text-gray-600">Penjelasan: Soekarno dan Mohammad Hatta atas nama bangsa Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="200">
-          <h3 class="text-lg font-semibold mb-2">3. Apa bunyi sila pertama Pancasila?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Ketuhanan Yang Maha Esa</strong></p>
-          <p class="text-gray-600">Penjelasan: Sila pertama Pancasila berbunyi "Ketuhanan Yang Maha Esa," yang mencerminkan keimanan kepada Tuhan.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="250">
-          <h3 class="text-lg font-semibold mb-2">4. Apa simbol negara Indonesia?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Garuda Pancasila</strong></p>
-          <p class="text-gray-600">Penjelasan: Garuda Pancasila adalah lambang negara Indonesia, yang mencerminkan nilai-nilai Pancasila.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-lg font-semibold mb-2">5. Siapa tokoh yang mengusulkan Pancasila sebagai dasar negara?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Soekarno</strong></p>
-          <p class="text-gray-600">Penjelasan: Soekarno mengusulkan Pancasila sebagai dasar negara pada sidang BPUPKI tanggal 1 Juni 1945.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="350">
-          <h3 class="text-lg font-semibold mb-2">6. Apa yang dimaksud dengan Keadilan Sosial?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Pemerataan ekonomi</strong></p>
-          <p class="text-gray-600">Penjelasan: Keadilan Sosial dalam Pancasila sila ke-5 mengacu pada pemerataan ekonomi untuk kesejahteraan rakyat.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="400">
-          <h3 class="text-lg font-semibold mb-2">7. Pancasila diusulkan pertama kali pada tahun berapa?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>1945</strong></p>
-          <p class="text-gray-600">Penjelasan: Pancasila diusulkan pada sidang BPUPKI pada tahun 1945.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="450">
-          <h3 class="text-lg font-semibold mb-2">8. Apa tujuan dari Pancasila sebagai dasar negara?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Untuk mempersatukan bangsa</strong></p>
-          <p class="text-gray-600">Penjelasan: Pancasila bertujuan untuk mempersatukan bangsa Indonesia dengan nilai-nilai yang menjadi pedoman bersama.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="500">
-          <h3 class="text-lg font-semibold mb-2">9. Siapa penulis naskah proklamasi kemerdekaan Indonesia?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>Sukarno dan Hatta</strong></p>
-          <p class="text-gray-600">Penjelasan: Naskah proklamasi disusun oleh Soekarno, Mohammad Hatta, dan Ahmad Soebardjo.</p>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover" data-aos="fade-up" data-aos-delay="550">
-          <h3 class="text-lg font-semibold mb-2">10. Pada tanggal berapa Indonesia memproklamirkan kemerdekaannya?</h3>
-          <p class="text-gray-600">Jawaban benar: <strong>17 Agustus 1945</strong></p>
-          <p class="text-gray-600">Penjelasan: Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945 di Jakarta.</p>
-        </div>
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Pembahasan Soal</h2>
+      <div id="explanationsContainer" class="space-y-6">
+        <!-- Explanations will be dynamically loaded here -->
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-6">
-    <div class="container mx-auto px-4 text-center">
-      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 UNNES STUDY ZONE. All rights reserved.</p>
-      <div class="flex justify-center space-x-4 mb-4">
-        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
-        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+  <!-- Performance Analysis & Recommendation Section (Hidden) -->
+  <section id="performanceAnalysis" class="py-16 bg-gray-100 hidden">
+    <div class="container mx-auto px-4">
+      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Analisis Performa & Rekomendasi</h2>
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold mb-4 text-center">Area yang Perlu Ditingkatkan:</h3>
+        <ul id="weakTopicsList" class="list-disc list-inside text-gray-700 space-y-2 mb-6">
+          <!-- Weak topics will be dynamically loaded here -->
+        </ul>
+        <h3 class="text-xl font-semibold mb-4 text-center">Rencana Rekomendasi Belajar:</h3>
+        <div id="recommendationPlan" class="text-gray-700 space-y-3">
+          <!-- Recommendations will be dynamically loaded here -->
+        </div>
       </div>
-      <div class="flex justify-center space-x-4">
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Contact Us</a>
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Privacy Policy</a>
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Terms of Service</a>
+      <div class="text-center mt-8">
+        <button onclick="window.location.reload();" class="bg-blue-600 text-white py-3 px-8 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105">
+          <i class="fas fa-redo mr-2"></i> Coba Tryout Lain
+        </button>
       </div>
-      <p class="mt-4 text-gray-400">Email: info@unnesstudyzone.com | Phone: +62 123 456 7890</p>
+    </div>
+  </section>
+
+  <!-- Footer (Copied from materi.html) -->
+  <footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-yellow-300 rounded-lg flex items-center justify-center mr-3">
+              <img src="logo.png" alt="Logo" class="w-8 h-8">
+            </div>
+            <span class="text-xl font-bold">UNNES STUDY ZONE</span>
+          </div>
+          <p class="text-gray-400 mb-4">
+            Platform persiapan UTS & UAS Online #1 di Indonesia untuk mahasiswa.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-youtube text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Menu</h3>
+          <ul class="space-y-3">
+            <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-300">Home</a></li>
+            <li><a href="index.html#features" class="text-gray-400 hover:text-white transition-colors duration-300">Features</a></li>
+            <li><a href="index.html#subjects" class="text-gray-400 hover:text-white transition-colors duration-300">Subjects</a></li>
+            <li><a href="index.html#packages" class="text-gray-400 hover:text-white transition-colors duration-300">Packages</a></li>
+            <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors duration-300">Account</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Bantuan</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">FAQ</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kontak Kami</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kebijakan Privasi</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Syarat & Ketentuan</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Kontak</h3>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3"></i>
+              <span>Jl. Pendidikan No. 1, Semarang, Jawa Tengah</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3"></i>
+              <span>hello@unnesstudyzone.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone-alt mt-1 mr-3"></i>
+              <span>(024) 1234 5678</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fab fa-whatsapp mt-1 mr-3"></i>
+              <span>+62 812 3456 7890</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+        <p>© 2025 UNNES STUDY ZONE. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
@@ -569,116 +413,406 @@
     <i class="fas fa-arrow-up"></i>
   </button>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
   <script>
-    // Initialize AOS
-    AOS.init({ duration: 800, once: true });
+    // --- Data for Courses/Subjects and Questions ---
+    // This structure mirrors the course data from materi.html for consistency in subject names
+    const courseListingData = {
+        'pancasila': { name: 'Pendidikan Pancasila' },
+        'kalkulus': { name: 'Kalkulus I' },
+        'algoritma': { name: 'Algoritma & Struktur Data' }
+    };
 
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      menuBtn.querySelector('i').classList.toggle('fa-bars');
-      menuBtn.querySelector('i').classList.toggle('fa-times');
-    });
+    // This contains the actual questions for the tryouts, mapped by course key
+    const tryoutQuestionsData = {
+        'pancasila': {
+            name: 'Pendidikan Pancasila', // Redundant but good for clarity
+            questions: [
+                { id: 'q1', text: 'Apa arti Pancasila sila ke-3?', options: {a: 'Persatuan Indonesia', b: 'Keadilan Sosial', c: 'Ketuhanan Yang Maha Esa', d: 'Kemanusiaan yang Adil dan Beradab'}, correct: 'a', topic: 'Sila Pancasila', explanation: 'Sila ke-3 Pancasila berbunyi "Persatuan Indonesia," yang menekankan pentingnya persatuan dan kesatuan bangsa.' },
+                { id: 'q2', text: 'Siapa proklamator kemerdekaan Indonesia?', options: {a: 'Soekarno dan Hatta', b: 'Soedirman dan Diponegoro', c: 'Bung Tomo dan Sutan Sjahrir', d: 'Muhammad Hatta dan A. R. Baswedan'}, correct: 'a', topic: 'Sejarah Kemerdekaan', explanation: 'Soekarno dan Mohammad Hatta atas nama bangsa Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945.' },
+                { id: 'q3', text: 'Apa bunyi sila pertama Pancasila?', options: {a: 'Ketuhanan Yang Maha Esa', b: 'Kemanusiaan yang Adil dan Beradab', c: 'Persatuan Indonesia', d: 'Keadilan Sosial bagi Seluruh Rakyat Indonesia'}, correct: 'a', topic: 'Sila Pancasila', explanation: 'Sila pertama Pancasila berbunyi "Ketuhanan Yang Maha Esa," yang mencerminkan keimanan kepada Tuhan.' },
+                { id: 'q4', text: 'Apa simbol negara Indonesia?', options: {a: 'Garuda Pancasila', b: 'Bintang Kejora', c: 'Peta Indonesia', d: 'Padi dan Kapas'}, correct: 'a', topic: 'Simbol Negara', explanation: 'Garuda Pancasila adalah lambang negara Indonesia, yang mencerminkan nilai-nilai Pancasila.' },
+                { id: 'q5', text: 'Siapa tokoh yang mengusulkan Pancasila sebagai dasar negara?', options: {a: 'Soekarno', b: 'Mohammad Hatta', c: 'Joko Widodo', d: 'Sukarno Hatta'}, correct: 'a', topic: 'Tokoh Pancasila', explanation: 'Soekarno mengusulkan Pancasila sebagai dasar negara pada sidang BPUPKI tanggal 1 Juni 1945.' },
+                { id: 'q6', text: 'Apa yang dimaksud dengan Keadilan Sosial?', options: {a: 'Pemerataan ekonomi', b: 'Pemberdayaan rakyat', c: 'Persatuan bangsa', d: 'Keberagaman sosial'}, correct: 'a', topic: 'Sila Pancasila', explanation: 'Keadilan Sosial dalam Pancasila sila ke-5 mengacu pada pemerataan ekonomi untuk kesejahteraan rakyat.' },
+                { id: 'q7', text: 'Pancasila diusulkan pertama kali pada tahun berapa?', options: {a: '1945', b: '1947', c: '1940', d: '1950'}, correct: 'a', topic: 'Sejarah Pancasila', explanation: 'Pancasila diusulkan pada sidang BPUPKI pada tahun 1945.' },
+                { id: 'q8', text: 'Apa tujuan dari Pancasila sebagai dasar negara?', options: {a: 'Untuk mempersatukan bangsa', b: 'Untuk memperjuangkan kemerdekaan', c: 'Untuk mendirikan negara', d: 'Untuk meningkatkan perekonomian'}, correct: 'a', topic: 'Tujuan Pancasila', explanation: 'Pancasila bertujuan untuk mempersatukan bangsa Indonesia dengan nilai-nilai yang menjadi pedoman bersama.' },
+                { id: 'q9', text: 'Siapa penulis naskah proklamasi kemerdekaan Indonesia?', options: {a: 'Soekarno', b: 'Sukarno dan Hatta', c: 'Sutan Sjahrir', d: 'Mohammad Hatta'}, correct: 'b', topic: 'Sejarah Kemerdekaan', explanation: 'Naskah proklamasi disusun oleh Soekarno, Mohammad Hatta, dan Ahmad Soebardjo.' },
+                { id: 'q10', text: 'Pada tanggal berapa Indonesia memproklamirkan kemerdekaannya?', options: {a: '17 Agustus 1945', b: '18 Agustus 1945', c: '16 Agustus 1945', d: '1 Juni 1945'}, correct: 'a', topic: 'Sejarah Kemerdekaan', explanation: 'Indonesia memproklamasikan kemerdekaan pada 17 Agustus 1945 di Jakarta.' },
+            ]
+        },
+        'kalkulus': {
+            name: 'Kalkulus I',
+            questions: [
+                { id: 'k1', text: 'Apa definisi dari limit fungsi?', options: {a: 'Nilai yang dihampiri suatu fungsi saat input mendekati suatu nilai', b: 'Turunan dari suatu fungsi', c: 'Integral dari suatu fungsi', d: 'Titik potong sumbu x'}, correct: 'a', topic: 'Limit', explanation: 'Limit fungsi adalah nilai yang dihampiri oleh nilai fungsi ketika variabelnya mendekati suatu titik tertentu.' },
+                { id: 'k2', text: 'Apa yang dimaksud dengan turunan fungsi?', options: {a: 'Laju perubahan sesaat suatu fungsi', b: 'Luas di bawah kurva', c: 'Anti-turunan', d: 'Titik maksimum fungsi'}, correct: 'a', topic: 'Turunan', explanation: 'Turunan fungsi mengukur seberapa sensitif perubahan nilai fungsi terhadap perubahan nilai inputnya.' },
+                { id: 'k3', text: 'Sebutkan salah satu aplikasi turunan dalam kehidupan nyata?', options: {a: 'Menghitung kecepatan objek', b: 'Menghitung volume benda', c: 'Menghitung luas lingkaran', d: 'Menentukan tinggi suatu bangunan'}, correct: 'a', topic: 'Aplikasi Turunan', explanation: 'Turunan dapat digunakan untuk menghitung kecepatan dan percepatan suatu objek, yang merupakan laju perubahan posisi dan kecepatan.' },
+            ]
+        },
+        'algoritma': {
+            name: 'Algoritma & Struktur Data',
+            questions: [
+                { id: 'a1', text: 'Apa itu algoritma?', options: {a: 'Serangkaian instruksi untuk menyelesaikan masalah', b: 'Bahasa pemrograman', c: 'Database', d: 'Desain website'}, correct: 'a', topic: 'Dasar Algoritma', explanation: 'Algoritma adalah urutan langkah-langkah yang jelas dan terstruktur untuk menyelesaikan suatu masalah atau tugas.' },
+                { id: 'a2', text: 'Contoh struktur data linier adalah?', options: {a: 'Array dan Linked List', b: 'Tree dan Graph', c: 'Hash Table dan Stack', d: 'Queue dan Hash Map'}, correct: 'a', topic: 'Struktur Data Linier', explanation: 'Array dan Linked List adalah contoh struktur data linier karena elemen-elemennya tersusun secara berurutan.' },
+                { id: 'a3', text: 'Apa tujuan utama dari algoritma Sorting?', options: {a: 'Mengurutkan elemen dalam suatu daftar', b: 'Mencari elemen tertentu', c: 'Menyimpan data secara efisien', d: 'Menggabungkan dua daftar'}, correct: 'a', topic: 'Sorting', explanation: 'Algoritma sorting bertujuan untuk mengurutkan elemen-elemen dalam suatu koleksi (misalnya array atau list) berdasarkan kriteria tertentu.' },
+            ]
+        }
+    };
 
-    // Scroll progress bar
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
-    });
+    let currentSubjectKey = '';
+    let currentQuestions = [];
+    let currentSelectedAnswers = {};
+    let timeLeft = 0;
+    let timerInterval;
+    let totalQuestions = 0; // To be set dynamically
 
-    // Back-to-top button
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTop.classList.remove('hidden');
-      } else {
-        backToTop.classList.add('hidden');
-      }
-    });
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Countdown timer
-    let timeLeft = 10 * 60; // 10 minutes in seconds
+    // --- DOM Elements ---
+    const subjectSelectionSection = document.getElementById('subjectSelection');
+    const subjectSelect = document.getElementById('subjectSelect');
+    const startTryoutBtn = document.getElementById('startTryoutBtn');
+    const tryoutHero = document.getElementById('tryoutHero');
+    const tryoutSubjectTitle = document.getElementById('tryoutSubjectTitle');
+    const progressTrackerSection = document.getElementById('progressTrackerSection');
+    const questionsSection = document.getElementById('questionsSection');
+    const questionsContainer = document.getElementById('questionsContainer');
     const timerDisplay = document.getElementById('timer');
+    const saveProgressBtn = document.getElementById('saveProgressBtn');
     const submitBtn = document.getElementById('submitBtn');
-    function updateTimer() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        timerDisplay.textContent = 'Waktu Habis!';
-        submitAnswers();
-      }
-      timeLeft--;
-    }
-    const timerInterval = setInterval(updateTimer, 1000);
-
-    // Question progress tracker
-    const questionInputs = document.querySelectorAll('input[type="radio"]');
-    const currentQuestionDisplay = document.getElementById('currentQuestion');
+    const scoreDisplay = document.getElementById('score');
+    const correctAnswersDisplay = document.getElementById('correctAnswers');
+    const scoreProgress = document.getElementById('scoreProgress');
+    const resultsSection = document.getElementById('results');
+    const explanationsSection = document.getElementById('explanations');
+    const explanationsContainer = document.getElementById('explanationsContainer');
     const questionProgress = document.getElementById('questionProgress');
-    function updateProgress() {
-      const answeredQuestions = Array.from(questionInputs).filter(input => input.checked).length / 4; // Each question has 4 options
-      currentQuestionDisplay.textContent = answeredQuestions;
-      questionProgress.style.width = (answeredQuestions / 10) * 100 + '%';
-    }
-    questionInputs.forEach(input => {
-      input.addEventListener('change', updateProgress);
-    });
+    const currentQuestionDisplay = document.getElementById('currentQuestion');
+    const totalQuestionsDisplay = document.getElementById('totalQuestions');
+    const resultsTotalQuestionsDisplay = document.getElementById('resultsTotalQuestions');
+    const performanceAnalysisSection = document.getElementById('performanceAnalysis');
+    const weakTopicsList = document.getElementById('weakTopicsList');
+    const recommendationPlan = document.getElementById('recommendationPlan');
 
-    // Save progress
-    document.getElementById('saveProgressBtn').addEventListener('click', () => {
+    // --- General Utility Functions ---
+    function showElement(element) {
+        if (element) element.classList.remove('hidden');
+    }
+    function hideElement(element) {
+        if (element) element.classList.add('hidden');
+    }
+    function showToastNotification(message) {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toastMessage');
-      toastMessage.textContent = 'Progres berhasil disimpan!';
+      toastMessage.textContent = message;
       toast.classList.remove('hidden');
       setTimeout(() => {
         toast.classList.add('hidden');
       }, 3000);
-    });
-
-    // Submit answers
-    function submitAnswers() {
-      const correctAnswers = {
-        q1: 'a', q2: 'a', q3: 'a', q4: 'a', q5: 'a',
-        q6: 'a', q7: 'a', q8: 'a', q9: 'b', q10: 'a'
-      };
-      let score = 0;
-      let correctCount = 0;
-      for (let i = 1; i <= 10; i++) {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        if (selected && selected.value === correctAnswers[`q${i}`]) {
-          score += 10;
-          correctCount++;
-        }
-      }
-      document.getElementById('score').textContent = score;
-      document.getElementById('correctAnswers').textContent = correctCount;
-      document.getElementById('scoreProgress').style.width = score + '%';
-      document.getElementById('results').classList.remove('hidden');
-      document.getElementById('explanations').classList.remove('hidden');
-      submitBtn.disabled = true;
-      clearInterval(timerInterval);
-      timerDisplay.textContent = 'Selesai';
-      window.scrollTo({ top: document.getElementById('results').offsetTop, behavior: 'smooth' });
     }
-    submitBtn.addEventListener('click', submitAnswers);
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    }
 
-    // Show loading spinner on page transition
-    document.querySelectorAll('a[href]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
-          document.getElementById('loading').classList.remove('hidden');
+    // --- Tryout Logic ---
+
+    // Function to load questions for the selected subject
+    function loadSubjectQuestions(subjectKey) {
+        currentSubjectKey = subjectKey;
+        const subjectTryoutData = tryoutQuestionsData[subjectKey];
+
+        if (!subjectTryoutData || !subjectTryoutData.questions || subjectTryoutData.questions.length === 0) {
+            console.error('No questions found for subject:', subjectKey);
+            showToastNotification('Tidak ada soal tryout untuk mata pelajaran ini.');
+            // Optionally, return to subject selection or show an error state
+            window.location.reload(); // Reload to go back to selection
+            return;
         }
-      });
+
+        currentQuestions = subjectTryoutData.questions;
+        totalQuestions = currentQuestions.length;
+        currentSelectedAnswers = {}; // Reset answers for new tryout
+
+        // Update UI for the tryout
+        tryoutSubjectTitle.textContent = subjectTryoutData.name;
+        totalQuestionsDisplay.textContent = totalQuestions;
+        resultsTotalQuestionsDisplay.textContent = totalQuestions;
+        currentQuestionDisplay.textContent = 0; // Reset answered questions counter
+        questionProgress.style.width = '0%'; // Reset progress bar
+
+        // Clear existing questions and explanations
+        questionsContainer.innerHTML = '';
+        explanationsContainer.innerHTML = '';
+
+        // Dynamically create question HTML
+        currentQuestions.forEach((q, index) => {
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'bg-gradient-card p-6 rounded-lg shadow-md card-hover';
+            
+            let optionsHtml = '';
+            for (const key in q.options) {
+                optionsHtml += `
+                    <label class="flex items-center">
+                        <input type="radio" name="${q.id}" value="${key}" class="mr-2 focus:ring-blue-600" data-question-index="${index}">
+                        <span>${q.options[key]}</span>
+                    </label>
+                `;
+            }
+
+            questionDiv.innerHTML = `
+                <h3 class="text-lg font-semibold mb-4">${index + 1}. ${q.text}</h3>
+                <div class="space-y-2">
+                    ${optionsHtml}
+                </div>
+            `;
+            questionsContainer.appendChild(questionDiv);
+
+            // Dynamically create explanation HTML
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'bg-gradient-card p-6 rounded-lg shadow-md card-hover';
+            explanationDiv.innerHTML = `
+                <h3 class="text-lg font-semibold mb-2">${index + 1}. ${q.text}</h3>
+                <p class="text-gray-600">Jawaban benar: <strong>${q.options[q.correct]}</strong></p>
+                <p class="text-gray-600">Penjelasan: ${q.explanation}</p>
+            `;
+            explanationsContainer.appendChild(explanationDiv);
+        });
+
+        // Add event listeners for new radio buttons
+        document.querySelectorAll('#questionsContainer input[type="radio"]').forEach(input => {
+            input.addEventListener('change', handleAnswerChange);
+        });
+    }
+
+    // Handles user selecting an answer
+    function handleAnswerChange(event) {
+        const questionId = event.target.name;
+        const selectedValue = event.target.value;
+        currentSelectedAnswers[questionId] = selectedValue; // Store the selected answer
+
+        updateQuestionProgress();
+    }
+
+    // Updates the question progress bar
+    function updateQuestionProgress() {
+        let answeredCount = 0;
+        currentQuestions.forEach(q => {
+            if (currentSelectedAnswers[q.id]) {
+                answeredCount++;
+            }
+        });
+        currentQuestionDisplay.textContent = answeredCount;
+        questionProgress.style.width = (answeredCount / totalQuestions) * 100 + '%';
+    }
+
+    // Starts the tryout timer
+    function startTimer() {
+        // Reset timeLeft for each new tryout. Assuming 10 minutes default.
+        timeLeft = 10 * 60; 
+        timerDisplay.textContent = formatTime(timeLeft);
+        if (timerInterval) clearInterval(timerInterval); // Clear any existing timer
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                timerDisplay.textContent = 'Waktu Habis!';
+                submitAnswers();
+            } else {
+                timerDisplay.textContent = formatTime(timeLeft);
+            }
+        }, 1000);
+    }
+
+    // Handles submitting answers (manual or via timer)
+    function submitAnswers() {
+        clearInterval(timerInterval); // Stop the timer
+        submitBtn.disabled = true; // Disable submit button after submission
+
+        let newScore = 0;
+        let correctCount = 0;
+        const topicScores = {}; // To track correct/total per topic
+
+        currentQuestions.forEach(q => {
+            const selected = currentSelectedAnswers[q.id];
+            
+            // Initialize topic score if not exists
+            if (!topicScores[q.topic]) {
+                topicScores[q.topic] = { correct: 0, total: 0 };
+            }
+            topicScores[q.topic].total++;
+
+            if (selected && selected === q.correct) {
+                newScore += (100 / totalQuestions); // Each correct answer adds to score
+                correctCount++;
+                topicScores[q.topic].correct++;
+            }
+        });
+
+        setResults(Math.round(newScore), correctCount);
+        showPerformanceAnalysis(topicScores);
+
+        // Scroll to results section
+        setTimeout(() => {
+            const resultsElement = document.getElementById('results');
+            if (resultsElement) {
+                window.scrollTo({ top: resultsElement.offsetTop - 80, behavior: 'smooth' });
+            }
+        }, 100);
+
+        // Disable all radio buttons after submission
+        document.querySelectorAll('#questionsContainer input[type="radio"]').forEach(input => {
+            input.disabled = true;
+        });
+    }
+
+    // Sets and displays the results
+    function setResults(finalScore, finalCorrectCount) {
+        scoreDisplay.textContent = finalScore;
+        correctAnswersDisplay.textContent = finalCorrectCount;
+        scoreProgress.style.width = finalScore + '%';
+        showElement(resultsSection);
+        showElement(explanationsSection); // Show explanations along with results
+    }
+
+    // Analyzes performance and shows recommendations
+    function showPerformanceAnalysis(topicScores) {
+        weakTopicsList.innerHTML = '';
+        recommendationPlan.innerHTML = '';
+
+        const weakAreas = [];
+        const strongAreas = [];
+
+        for (const topic in topicScores) {
+            const { correct, total } = topicScores[topic];
+            if (total > 0) {
+                const percentage = (correct / total) * 100;
+                if (percentage < 70) { // Threshold for "weak" topic
+                    weakAreas.push({ topic, correct, total, percentage });
+                } else {
+                    strongAreas.push({ topic, correct, total, percentage });
+                }
+            }
+        }
+
+        if (weakAreas.length > 0) {
+            weakAreas.sort((a, b) => a.percentage - b.percentage); // Sort by lowest percentage
+            weakAreas.forEach(area => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i><strong>${area.topic}</strong> (Benar: ${area.correct}/${area.total}, ${area.percentage.toFixed(0)}%)`;
+                weakTopicsList.appendChild(listItem);
+
+                const recommendationText = document.createElement('p');
+                recommendationText.className = 'bg-blue-50 border-l-4 border-blue-400 p-3 rounded-md italic';
+                recommendationText.innerHTML = `<i class="fas fa-lightbulb text-blue-600 mr-2"></i> Untuk topik <strong>"${area.topic}"</strong>, fokuslah pada konsep dasar dan coba latihan soal serupa untuk memperkuat pemahaman Anda. Anda dapat mencari materi di bagian 'Materi' atau mencoba tryout lain khusus topik ini.`;
+                recommendationPlan.appendChild(recommendationText);
+            });
+        } else {
+            weakTopicsList.innerHTML = '<li><i class="fas fa-thumbs-up text-green-500 mr-2"></i> Selamat! Anda tidak memiliki area kelemahan yang signifikan berdasarkan tryout ini.</li>';
+            recommendationPlan.innerHTML = '<p class="bg-green-50 border-l-4 border-green-400 p-3 rounded-md italic"><i class="fas fa-medal text-green-600 mr-2"></i> Pertahankan performa Anda! Teruslah berlatih dengan soal-soal tingkat lanjut atau coba mata pelajaran baru untuk meningkatkan wawasan.</p>';
+        }
+
+        showElement(performanceAnalysisSection);
+    }
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuBtn.querySelector('i').classList.toggle('fa-bars');
+                menuBtn.querySelector('i').classList.toggle('fa-times');
+            });
+        }
+
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (docHeight > 0) ? (scrollTop / docHeight) * 100 : 0;
+            document.getElementById('scrollProgress').style.width = scrollPercent + '%';
+        });
+
+        // Back-to-top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.remove('hidden');
+            } else {
+                backToTop.classList.add('hidden');
+            }
+        });
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Populate subject select dropdown based on courseListingData
+        for (const key in courseListingData) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.textContent = courseListingData[key].name;
+            subjectSelect.appendChild(option);
+        }
+
+        // Subject selection change
+        subjectSelect.addEventListener('change', () => {
+            if (subjectSelect.value && tryoutQuestionsData[subjectSelect.value]) {
+                showElement(startTryoutBtn);
+            } else {
+                hideElement(startTryoutBtn);
+                showToastNotification('Tidak ada soal tryout untuk mata pelajaran ini atau belum dipilih.');
+            }
+        });
+
+        // Start Tryout button click
+        startTryoutBtn.addEventListener('click', () => {
+            const selectedSubject = subjectSelect.value;
+            if (selectedSubject && tryoutQuestionsData[selectedSubject]) {
+                hideElement(subjectSelectionSection);
+                showElement(tryoutHero);
+                showElement(progressTrackerSection);
+                showElement(questionsSection);
+                loadSubjectQuestions(selectedSubject);
+                startTimer();
+                // Scroll to the top of the tryout section
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                showToastNotification('Pilih mata pelajaran yang valid terlebih dahulu!');
+            }
+        });
+
+        // Save progress button
+        saveProgressBtn.addEventListener('click', () => {
+            showToastNotification('Progres berhasil disimpan!');
+            // In a real application, you would send currentSelectedAnswers to a backend here.
+            console.log('Saved Progress:', currentSelectedAnswers);
+        });
+
+        // Submit button
+        submitBtn.addEventListener('click', submitAnswers);
+
+        // Show loading spinner on page transition for external links (not hash links)
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.includes('whatsapp') && !href.includes('instagram') && !href.includes('twitter') && !href.includes('facebook') && !href.includes('youtube')) {
+                    const loadingScreen = document.getElementById('loading');
+                    if (loadingScreen) {
+                        loadingScreen.classList.remove('hidden');
+                    }
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar'); // Ensure navbar is defined here
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled', 'shadow-lg');
+            } else {
+                navbar.classList.remove('scrolled', 'shadow-lg');
+            }
+        });
     });
   </script>
 </body>

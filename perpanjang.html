@@ -1,59 +1,28 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perpanjang Paket - PNF STUDY ZONE</title>
+  <title>Perpanjang Paket - UNNES STUDY ZONE</title>
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="shortcut icon" href="https://iili.io/3QZn4Ag.png" type="image/x-icon">
+  <link rel="shortcut icon" href="icon.png" type="image/x-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
     body {
       font-family: 'Poppins', sans-serif;
       scroll-behavior: smooth;
+      padding-top: var(--navbar-height, 90px); /* Adjust for fixed navbar */
+    }
+    nav {
+        font-family: 'Inter', sans-serif;
+    }
+    nav#navbar {
+      height: var(--navbar-height, 90px);
     }
     
     /* Modern gradient backgrounds */
@@ -63,6 +32,11 @@
     
     .bg-gradient-card {
       background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+    }
+
+    /* Initial gradient for the navbar from new.html */
+    .bg-gradient-hero-nav {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 35%, #7c3aed 100%);
     }
     
     /* Custom animations */
@@ -171,6 +145,19 @@
     .modal {
       transition: opacity 0.3s ease;
     }
+
+    /* Navbar scrolled state (from akun.html) */
+    nav#navbar.scrolled {
+      background: rgba(15, 23, 42, 0.9); /* bg-slate-900 with higher opacity */
+      backdrop-filter: blur(10px);
+    }
+
+    /* Notification banner styles */
+    #expiryNotificationBanner {
+        background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 100%);
+        color: #b91c1c;
+        border-left: 5px solid #ef4444;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -183,35 +170,74 @@
   </div>
   
   <!-- Toast notification -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
+  <div id="toast" class="fixed bottom-5 right-5 text-white p-4 rounded-lg shadow-lg z-50 hidden toast">
     <div class="flex items-center">
-      <i class="fas fa-check-circle mr-2"></i>
-      <span id="toastMessage">Perpanjangan paket berhasil!</span>
+      <i class="fas mr-2"></i>
+      <span id="toastMessage"></span>
     </div>
   </div>
 
   <!-- Renewal Confirmation Modal -->
-  <div id="renewalModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div id="renewalModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
     <div class="bg-white rounded-lg p-6 max-w-md w-full card-hover" data-aos="zoom-in">
       <h3 class="text-xl font-bold text-gray-800 mb-4">Konfirmasi Perpanjangan</h3>
-      <p class="text-gray-600 mb-4">Anda akan memperpanjang paket <span id="modalPackage">Belum dipilih</span> dengan metode <span id="modalMethod">Belum dipilih</span>.</p>
-      <p class="text-gray-600 mb-6">Nominal: <span id="modalAmount">Rp 0</span></p>
+      <p class="text-gray-600 mb-4">Anda akan memperpanjang paket <span id="modalPackage"></span> dengan durasi <span id="modalDuration"></span>.</p>
+      <p class="text-gray-600 mb-6">Nominal: <span id="modalAmount"></span></p>
+      <h4 class="text-md font-semibold text-gray-800 mb-3">Pilih Metode Pembayaran</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            <button data-method="Transfer Bank" class="select-modal-method bg-gray-100 p-3 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center text-sm border border-gray-200">
+            <i class="fas fa-university mr-2"></i> Transfer
+            </button>
+            <button data-method="QRIS" class="select-modal-method bg-gray-100 p-3 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center text-sm border border-gray-200">
+            <i class="fas fa-qrcode mr-2"></i> QRIS
+            </button>
+            <button data-method="E-Wallet" class="select-modal-method bg-gray-100 p-3 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center text-sm border border-gray-200">
+            <i class="fas fa-wallet mr-2"></i> E-Wallet
+            </button>
+        </div>
+        <p id="modalMethodInstruction" class="text-gray-600 text-center text-sm mb-6 hidden">Metode terpilih: <span id="selectedModalMethod" class="font-semibold text-blue-600"></span></p>
+
       <div class="flex justify-end gap-4">
         <button id="cancelRenewal" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all">Batal</button>
-        <button id="confirmRenewal" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">Perpanjang Sekarang</button>
+        <button id="confirmRenewal" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>Perpanjang Sekarang</button>
       </div>
     </div>
   </div>
 
+    <!-- Package Detail Modal -->
+    <div id="packageDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden modal">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full card-hover max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-gray-800 mb-4" id="detailPackageName"></h3>
+            <p class="text-gray-600 mb-4" id="detailOriginalDuration"></p>
+            <h4 class="text-lg font-semibold text-gray-800 mb-2">Manfaat Paket:</h4>
+            <ul class="list-disc list-inside text-gray-700 mb-6" id="detailBenefits">
+                <!-- Benefits populated by JS -->
+            </ul>
+            <div class="flex justify-end">
+                <button id="closeDetailModal" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiry Notification Banner -->
+    <div id="expiryNotificationBanner" class="fixed top-0 left-0 right-0 z-40 p-4 text-center hidden shadow-md mt-[var(--navbar-height, 90px)]">
+        <p><i class="fas fa-exclamation-triangle mr-2"></i> <span id="bannerMessage">Akses beberapa paket Anda akan segera habis. Perpanjang sekarang!</span>
+            <a href="#packages-list" class="underline font-semibold ml-2">Lihat Paket</a>
+            <button id="closeBanner" class="ml-4 text-red-700 hover:text-red-900"><i class="fas fa-times"></i></button>
+        </p>
+    </div>
+
+
   <!-- Navigation -->
-  <nav class="bg-gradient-blue text-white sticky top-0 z-40 shadow-lg">
+  <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-gradient-hero-nav text-white shadow-lg" id="navbar">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-center py-4">
-        <div class="flex items-center space-x-2">
-          <div class="text-2xl font-bold flex items-center">
-            <i class="fas fa-graduation-cap mr-2 animate-float"></i>
-            <a href="index.html" class="hover:opacity-80 transition-opacity">PNF STUDY ZONE</a>
-          </div>
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-yellow-300 rounded-lg flex items-center justify-center mr-3 shadow-lg">
+                <img src="logo.png" alt="Logo" class="w-8 h-8"> 
+            </div>
+            <a href="index.html" class="text-3xl font-extrabold text-white hover:opacity-80 transition-opacity">UNNES</a>
+            <a href="index.html" class="text-3xl font-medium text-blue-200 hover:opacity-80 transition-opacity">STUDY ZONE</a>
         </div>
         
         <!-- Desktop Menu -->
@@ -294,96 +320,98 @@
     </div>
   </section>
 
-  <!-- Packages Section -->
-  <section id="packages" class="py-16 bg-white">
+  <!-- Packages List Section -->
+  <section id="packages-list" class="py-16 bg-white">
     <div class="container mx-auto px-4">
       <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Pilih Paket untuk Perpanjangan</h2>
-        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Pilih paket yang sesuai untuk melanjutkan pembelajaran Anda.</p>
+        <h2 class="text-3xl font-bold text-gray-800" data-aos="fade-up">Paket Anda yang Perlu Perhatian</h2>
+        <p class="text-gray-600 mt-2 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">Berikut adalah paket belajar Anda yang akan segera kadaluarsa atau sudah kadaluarsa.</p>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent" data-aos="fade-up" data-aos-delay="100">
-          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Akses 1x Tryout untuk 1 Mata Kuliah</div>
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">BASIC</h3>
-          <p class="text-gray-600 mb-4">Akses 1x Tryout untuk 1 Mata Kuliah</p>
-          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 5.000</p>
-          <button data-package="BASIC" data-price="5000" class="select-package w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center justify-center">
-            <i class="fas fa-check-circle mr-2"></i> Pilih Paket
-          </button>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent border-2 border-yellow-400" data-aos="fade-up" data-aos-delay="150">
-          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Akses semua Tryout + Feedback Nilai (Paket Saat Ini)</div>
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">PREMIUM</h3>
-          <p class="text-gray-600 mb-4">Akses ke semua Tryout + Feedback Nilai</p>
-          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 15.000</p>
-          <button data-package="PREMIUM" data-price="15000" class="select-package w-full bg-yellow-400 text-blue-900 py-2 rounded-lg font-semibold hover:bg-yellow-300 transition-all transform hover:scale-105 flex items-center justify-center">
-            <i class="fas fa-check-circle mr-2"></i> Paket Saat Ini
-          </button>
-        </div>
-        <div class="bg-gradient-card p-6 rounded-lg shadow-md card-hover relative tooltip-parent" data-aos="fade-up" data-aos-delay="200">
-          <div class="tooltip absolute top-0 left-1/2 transform -translate-x-1/2 -mt-12 bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg">Paket untuk 5 orang untuk 1x Tryout</div>
-          <h3 class="text-xl font-semibold text-gray-800 mb-2">GROUP</h3>
-          <p class="text-gray-600 mb-4">Paket untuk 5 orang untuk 1x Tryout</p>
-          <p class="text-2xl font-bold text-blue-600 mb-4">Rp 20.000</p>
-          <button data-package="GROUP" data-price="20000" class="select-package w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all transform hover:scale-105 flex items-center justify-center">
-            <i class="fas fa-check-circle mr-2"></i> Pilih Paket
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Renewal Details Section -->
-  <section id="renewal-details" class="py-16 bg-gray-100">
-    <div class="container mx-auto px-4">
-      <h2 class="text-3xl font-bold text-gray-800 text-center mb-8" data-aos="fade-up">Detail Perpanjangan</h2>
-      <div class="max-w-lg mx-auto bg-white rounded-lg shadow-md p-6 bg-gradient-card card-hover" data-aos="fade-up" data-aos-delay="100">
-        <div class="mb-4">
-          <p class="text-gray-600">Nama Paket: <span id="selectedPackage" class="font-semibold">PREMIUM</span></p>
-          <p class="text-gray-600 mt-2">Nominal Perpanjangan: <span id="selectedPrice" class="font-semibold">Rp 15.000</span></p>
-          <p class="text-gray-600 mt-2">Masa Aktif Baru: <span id="newExpiry" class="font-semibold">31 Desember 2026</span></p>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Pilih Metode Pembayaran</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <button data-method="Transfer Bank" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
-            <i class="fas fa-university mr-2"></i> Transfer Bank
-          </button>
-          <button data-method="QRIS" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
-            <i class="fas fa-qrcode mr-2"></i> QRIS
-          </button>
-          <button data-method="E-Wallet" class="select-method bg-gray-100 p-4 rounded-lg text-gray-800 hover:bg-blue-100 transition-all flex items-center justify-center">
-            <i class="fas fa-wallet mr-2"></i> E-Wallet
-          </button>
-        </div>
-        <p id="renewalInstruction" class="text-gray-600 text-center mb-6">Pilih metode pembayaran untuk memperpanjang paket PREMIUM.</p>
-        <div class="flex justify-center gap-4">
-          <a href="https://whatsapp.com" target="_blank" class="bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-all flex items-center">
-            <i class="fab fa-whatsapp mr-2"></i> Hubungi Admin
-          </a>
-          <button id="renewNowBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center disabled:bg-gray-400" disabled>
-            <i class="fas fa-sync-alt mr-2"></i> Perpanjang Sekarang
-          </button>
-        </div>
+      <div id="userPackagesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Paket-paket pengguna akan dirender di sini oleh JavaScript -->
+        <p id="noPackagesMessage" class="col-span-full text-center text-gray-500 hidden">Tidak ada paket yang akan kadaluarsa atau sudah kadaluarsa saat ini.</p>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-6">
-    <div class="container mx-auto px-4 text-center">
-      <p class="mb-4 transition-opacity duration-300 hover:opacity-80">© 2025 PNF STUDY ZONE. All rights reserved.</p>
-      <div class="flex justify-center space-x-4 mb-4">
-        <a href="https://whatsapp.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        <a href="https://instagram.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-instagram"></i> Instagram</a>
-        <a href="https://twitter.com" class="hover:text-blue-200 transition-colors duration-200"><i class="fab fa-twitter"></i> Twitter</a>
+  <footer class="bg-gray-900 text-white pt-16 pb-8">
+    <div class="container mx-auto px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-yellow-300 rounded-lg flex items-center justify-center mr-3 shadow-lg">
+                <img src="logo.png" alt="Logo" class="w-8 h-8"> 
+            </div>
+            <span class="text-xl font-bold">UNNES STUDY ZONE</span>
+          </div>
+          <p class="text-gray-400 mb-4">
+            Platform persiapan UTS & UAS Online #1 di Indonesia untuk mahasiswa.
+          </p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-twitter text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-facebook text-xl"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">
+              <i class="fab fa-youtube text-xl"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Menu</h3>
+          <ul class="space-y-3">
+            <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-300">Home</a></li>
+            <li><a href="index.html#features" class="text-gray-400 hover:text-white transition-colors duration-300">Features</a></li>
+            <li><a href="index.html#subjects" class="text-gray-400 hover:text-white transition-colors duration-300">Subjects</a></li>
+            <li><a href="index.html#packages" class="text-gray-400 hover:text-white transition-colors duration-300">Packages</a></li>
+            <li><a href="login.html" class="text-gray-400 hover:text-white transition-colors duration-300">Account</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Bantuan</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">FAQ</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kontak Kami</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Kebijakan Privasi</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-300">Syarat & Ketentuan</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">Kontak</h3>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-3"></i>
+              <span>Jl. Pendidikan No. 1, Semarang, Jawa Tengah</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope mt-1 mr-3"></i>
+              <span>hello@unnesstudyzone.com</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone-alt mt-1 mr-3"></i>
+              <span>(024) 1234 5678</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fab fa-whatsapp mt-1 mr-3"></i>
+              <span>+62 812 3456 7890</span>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div class="flex justify-center space-x-4">
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Contact Us</a>
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Privacy Policy</a>
-        <a href="#" class="hover:text-blue-200 transition-colors duration-200">Terms of Service</a>
+      
+      <div class="border-t border-gray-800 pt-8 text-center text-gray-500">
+        <p>© 2025 UNNES STUDY ZONE. All rights reserved.</p>
       </div>
-      <p class="mt-4 text-gray-400">Email: info@pnfstudyzone.com | Phone: +62 123 456 7890</p>
     </div>
   </footer>
 
@@ -397,129 +425,599 @@
     // Initialize AOS
     AOS.init({ duration: 800, once: true });
 
-    // Mobile menu toggle
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    menuBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('hidden');
-      menuBtn.querySelector('i').classList.toggle('fa-bars');
-      menuBtn.querySelector('i').classList.toggle('fa-times');
-    });
-
-    // Scroll progress bar
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollPercent = (scrollTop / docHeight) * 100;
-      document.getElementById('scrollProgress').style.width = scrollPercent + '%';
-    });
-
-    // Back-to-top button
-    const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 300) {
-        backToTop.classList.remove('hidden');
-      } else {
-        backToTop.classList.add('hidden');
-      }
-    });
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
-    // Package selection
-    let selectedPackage = 'PREMIUM';
-    let selectedPrice = '15000';
-    let selectedMethod = null;
-    const packageButtons = document.querySelectorAll('.select-package');
-    const methodButtons = document.querySelectorAll('.select-method');
-    const selectedPackageDisplay = document.getElementById('selectedPackage');
-    const selectedPriceDisplay = document.getElementById('selectedPrice');
-    const newExpiryDisplay = document.getElementById('newExpiry');
-    const renewalInstruction = document.getElementById('renewalInstruction');
-    const renewNowBtn = document.getElementById('renewNowBtn');
-
-    packageButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        packageButtons.forEach(btn => {
-          btn.classList.remove('bg-yellow-400', 'text-blue-900');
-          btn.classList.add('bg-blue-600', 'text-white');
-          btn.innerHTML = `<i class="fas fa-check-circle mr-2"></i> Pilih Paket`;
-        });
-        button.classList.add('bg-yellow-400', 'text-blue-900');
-        button.innerHTML = `<i class="fas fa-check-circle mr-2"></i> Paket Dipilih`;
-        selectedPackage = button.getAttribute('data-package');
-        selectedPrice = button.getAttribute('data-price');
-        selectedPackageDisplay.textContent = selectedPackage;
-        selectedPriceDisplay.textContent = `Rp ${parseInt(selectedPrice).toLocaleString()}`;
-        newExpiryDisplay.textContent = selectedPackage === 'PREMIUM' ? '31 Desember 2026' : '31 Desember 2025';
-        updateRenewalState();
-      });
-    });
-
-    // Payment method selection
-    methodButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        methodButtons.forEach(btn => btn.classList.remove('bg-blue-200'));
-        button.classList.add('bg-blue-200');
-        selectedMethod = button.getAttribute('data-method');
-        updateRenewalState();
-      });
-    });
-
-    // Update renewal state
-    function updateRenewalState() {
-      if (selectedPackage && selectedMethod) {
-        renewalInstruction.textContent = `Lanjutkan pembayaran untuk memperpanjang paket ${selectedPackage} melalui ${selectedMethod}.`;
-        renewNowBtn.disabled = false;
-      } else {
-        renewalInstruction.textContent = `Pilih metode pembayaran untuk memperpanjang paket ${selectedPackage}.`;
-        renewNowBtn.disabled = true;
-      }
-    }
-
-    // Renewal modal
-    const renewalModal = document.getElementById('renewalModal');
-    const modalPackage = document.getElementById('modalPackage');
-    const modalMethod = document.getElementById('modalMethod');
-    const modalAmount = document.getElementById('modalAmount');
-    const cancelRenewal = document.getElementById('cancelRenewal');
-    const confirmRenewal = document.getElementById('confirmRenewal');
-
-    renewNowBtn.addEventListener('click', () => {
-      modalPackage.textContent = selectedPackage;
-      modalMethod.textContent = selectedMethod;
-      modalAmount.textContent = `Rp ${parseInt(selectedPrice).toLocaleString()}`;
-      renewalModal.classList.remove('hidden');
-    });
-
-    cancelRenewal.addEventListener('click', () => {
-      renewalModal.classList.add('hidden');
-    });
-
-    confirmRenewal.addEventListener('click', () => {
-      renewalModal.classList.add('hidden');
+    // --- Global Utility Functions (from akun.html for consistency) ---
+    function showElement(element) { if (element) element.classList.remove('hidden'); }
+    function hideElement(element) { if (element) element.classList.add('hidden'); }
+    function showToastNotification(message, type = 'success') {
       const toast = document.getElementById('toast');
       const toastMessage = document.getElementById('toastMessage');
-      toastMessage.textContent = 'Perpanjangan paket berhasil! Anda akan diarahkan ke halaman akun.';
-      toast.classList.remove('hidden');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-        window.location.href = 'akun.html';
-      }, 2000);
-    });
+      const toastIcon = toast.querySelector('i');
 
-    // Show loading spinner on page transition
-    document.querySelectorAll('a[href]').forEach(link => {
-      link.addEventListener('click', (e) => {
-        if (!link.href.includes('#') && !link.href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter')) {
-          document.getElementById('loading').classList.remove('hidden');
+      if (!toast || !toastMessage || !toastIcon) {
+          console.error("Toast elements not found!");
+          return;
+      }
+
+      toastMessage.textContent = message;
+      toast.classList.remove('bg-green-500', 'bg-red-500', 'bg-blue-500'); // Clear previous types
+      toastIcon.classList.remove('fa-check-circle', 'fa-times-circle', 'fa-info-circle');
+
+      if (type === 'success') {
+        toast.classList.add('bg-green-500');
+        toastIcon.classList.add('fa-check-circle');
+      } else if (type === 'error') {
+        toast.classList.add('bg-red-500');
+        toastIcon.classList.add('fa-times-circle');
+      } else if (type === 'info') {
+        toast.classList.add('bg-blue-500');
+        toastIcon.classList.add('fa-info-circle');
+      }
+      
+      showElement(toast);
+      setTimeout(() => { hideElement(toast); }, 3000);
+    }
+
+    // Function to download a dummy PDF (for certificates/invoices)
+    function downloadDummyPdf(filename) {
+        const dummyContent = "Ini adalah dokumen dummy sertifikat/invoice dari UNNES Study Zone.\n\nSimulasi Unduhan Berhasil!";
+        const blob = new Blob([dummyContent], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToastNotification(`Mengunduh ${filename}...`, 'info');
+    }
+
+    // --- DOM Elements ---
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const scrollProgress = document.getElementById('scrollProgress');
+    const backToTop = document.getElementById('backToTop');
+    const loadingScreen = document.getElementById('loading');
+    const navbar = document.getElementById('navbar');
+
+    const userPackagesContainer = document.getElementById('userPackagesContainer');
+    const noPackagesMessage = document.getElementById('noPackagesMessage');
+
+    // Renewal Modal elements
+    const renewalModal = document.getElementById('renewalModal');
+    const modalPackage = document.getElementById('modalPackage');
+    const modalDuration = document.getElementById('modalDuration');
+    const modalAmount = document.getElementById('modalAmount');
+    const selectModalMethods = document.querySelectorAll('.select-modal-method');
+    const selectedModalMethodSpan = document.getElementById('selectedModalMethod');
+    const modalMethodInstruction = document.getElementById('modalMethodInstruction');
+    const cancelRenewalBtn = document.getElementById('cancelRenewal');
+    const confirmRenewalBtn = document.getElementById('confirmRenewal');
+
+    // Package Detail Modal elements
+    const packageDetailModal = document.getElementById('packageDetailModal');
+    const detailPackageName = document.getElementById('detailPackageName');
+    const detailOriginalDuration = document.getElementById('detailOriginalDuration');
+    const detailBenefits = document.getElementById('detailBenefits');
+    const closeDetailModalBtn = document.getElementById('closeDetailModal');
+
+    // Expiry Notification Banner elements
+    const expiryNotificationBanner = document.getElementById('expiryNotificationBanner');
+    const bannerMessage = document.getElementById('bannerMessage');
+    const closeBannerBtn = document.getElementById('closeBanner');
+
+    let currentSelectedPackageForRenewal = null; // Stores the package object being renewed
+    let currentSelectedDurationForRenewal = null; // Stores the selected duration string (+3 Bulan, etc.)
+    let currentSelectedPriceForRenewal = 0; // Stores the calculated price for renewal
+    let currentSelectedMethodForRenewal = null; // Stores the selected payment method in modal
+
+    // Dummy data for initial simulation if localStorage is empty
+    const dummyUserPackages = [
+        {
+            id: 'pkg-basic-001',
+            name: 'Paket BASIC - Pengantar Matematika',
+            packageType: 'Kursus Singkat',
+            originalPrice: 5000,
+            originalDuration: '3 Bulan',
+            purchaseDate: '2025-01-15',
+            expiryDate: '2025-07-15', // Expires in less than 30 days
+            accessModel: 'one-time',
+            benefits: ['Akses 1x Tryout untuk 1 Mata Kuliah', 'Materi Dasar Pengantar Matematika'],
+            upgradePath: {
+                name: 'PREMIUM',
+                page: 'paket.html' // Assuming paket.html shows upgrade options
+            },
+            contentAccessPage: 'tryout.html'
+        },
+        {
+            id: 'pkg-premium-001',
+            name: 'Paket PREMIUM - Literasi Digital',
+            packageType: 'Bundle Paket',
+            originalPrice: 15000,
+            originalDuration: '6 Bulan',
+            purchaseDate: '2024-12-01',
+            expiryDate: '2025-06-01', // Already expired
+            accessModel: 'subscription',
+            benefits: ['Akses semua Tryout', 'Feedback Nilai Mendalam', 'Update Materi Terbaru', 'Dukungan Prioritas'],
+            upgradePath: {
+                name: 'Program Sertifikasi',
+                page: 'paket.html' // Assuming paket.html shows upgrade options
+            },
+            contentAccessPage: 'materi.html'
+        },
+        {
+            id: 'pkg-group-001',
+            name: 'Paket GROUP - Bahasa Inggris',
+            packageType: 'Kursus Singkat',
+            originalPrice: 20000,
+            originalDuration: '1 Tahun',
+            purchaseDate: '2024-03-20',
+            expiryDate: '2025-03-20', // Already expired
+            accessModel: 'one-time',
+            benefits: ['Paket untuk 5 orang', 'Akses 1x Tryout bersama'],
+            upgradePath: null, // No upgrade path for group
+            contentAccessPage: 'tryout.html'
+        },
+        {
+            id: 'pkg-certification-001',
+            name: 'Program Sertifikasi - Data Science',
+            packageType: 'Program Sertifikasi',
+            originalPrice: 150000,
+            originalDuration: '1 Tahun',
+            purchaseDate: '2024-05-10',
+            expiryDate: '2025-05-10', // Already expired
+            accessModel: 'one-time',
+            benefits: ['Akses Semua Modul Data Science', 'Proyek Akhir', 'Sertifikat Digital', 'Bimbingan Mentor'],
+            upgradePath: null,
+            contentAccessPage: 'materi.html' // Example, might link to a specific program page
+        },
+        {
+            id: 'pkg-active-001',
+            name: 'Paket AKTIF - Sejarah Indonesia',
+            packageType: 'Kursus Singkat',
+            originalPrice: 10000,
+            originalDuration: '1 Tahun',
+            purchaseDate: '2025-01-01',
+            expiryDate: '2026-01-01', // Still active, not expiring soon
+            accessModel: 'one-time',
+            benefits: ['Akses Tryout Sejarah', 'Materi Lengkap Sejarah Indonesia'],
+            upgradePath: null,
+            contentAccessPage: 'materi.html'
+        },
+        {
+            id: 'pkg-lifetime-001',
+            name: 'Paket LIFETIME - All Access',
+            packageType: 'Lifetime Access',
+            originalPrice: 500000,
+            originalDuration: 'Lifetime',
+            purchaseDate: '2023-01-01',
+            expiryDate: 'Lifetime', // Lifetime access
+            accessModel: 'lifetime',
+            benefits: ['Akses Seumur Hidup ke Semua Konten', 'Prioritas Dukungan', 'Akses Fitur Premium Mendatang'],
+            upgradePath: null,
+            contentAccessPage: 'materi.html'
         }
-      });
-    });
+    ];
 
-    // Initialize renewal state
-    updateRenewalState();
+    // Initialize user packages in localStorage if not already present
+    if (!localStorage.getItem('userPackages')) {
+        localStorage.setItem('userPackages', JSON.stringify(dummyUserPackages));
+    }
+
+    // Define all available packages for upgrade paths (simplified for demo)
+    const allAvailablePackages = {
+        'BASIC': { name: 'Paket BASIC', price: 5000, benefits: ['Akses 1x Tryout untuk 1 Mata Kuliah', 'Materi Dasar'] },
+        'PREMIUM': { name: 'Paket PREMIUM', price: 15000, benefits: ['Akses semua Tryout', 'Feedback Nilai Mendalam', 'Update Materi Terbaru', 'Dukungan Prioritas'] },
+        'GROUP': { name: 'Paket GROUP', price: 20000, benefits: ['Paket untuk 5 orang', 'Akses 1x Tryout bersama'] },
+        'Program Sertifikasi': { name: 'Program Sertifikasi - Data Science', price: 150000, benefits: ['Akses Semua Modul Data Science', 'Proyek Akhir', 'Sertifikat Digital', 'Bimbingan Mentor'] }
+    };
+
+
+    /**
+     * Helper to format date
+     * @param {Date} dateObj
+     * @returns {string} Formatted date string
+     */
+    function formatDate(dateObj) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return dateObj.toLocaleDateString('id-ID', options);
+    }
+
+    /**
+     * Calculates the renewal price based on package and duration.
+     * For MVP, it's just the original price. Future: apply discounts.
+     * @param {Object} packageData - The package object.
+     * @param {string} durationOption - The chosen duration for renewal (e.g., '+3 Bulan').
+     * @returns {number} Calculated price.
+     */
+    function calculateRenewalPrice(packageData, durationOption) {
+        let price = packageData.originalPrice;
+        // In the future, add logic for discounts based on durationOption or loyalty
+        // e.g., if (durationOption === '+1 Tahun') price = packageData.originalPrice * 0.9;
+        return price;
+    }
+
+    /**
+     * Calculates the new expiry date based on current expiry and chosen renewal duration.
+     * @param {Date} currentExpiryDate - The current expiry date object.
+     * @param {string} durationOption - The chosen duration for renewal (e.g., '+3 Bulan').
+     * @returns {Date} New expiry date object.
+     */
+    function calculateNewExpiryDate(currentExpiryDate, durationOption) {
+        let newDate = new Date(currentExpiryDate.getTime()); // Copy current date
+
+        if (durationOption.includes('Bulan')) {
+            const months = parseInt(durationOption.replace('+', '').replace(' Bulan', ''));
+            newDate.setMonth(newDate.getMonth() + months);
+        } else if (durationOption.includes('Tahun')) {
+            const years = parseInt(durationOption.replace('+', '').replace(' Tahun', ''));
+            newDate.setFullYear(newDate.getFullYear() + years);
+        } else if (durationOption === 'Lifetime') {
+            return 'Lifetime'; // Special case for lifetime access
+        }
+        return newDate;
+    }
+
+    /**
+     * Displays a package in a modal with more details.
+     * @param {Object} packageData - The package object.
+     */
+    function showPackageDetailModal(packageData) {
+        if (!packageDetailModal || !detailPackageName || !detailOriginalDuration || !detailBenefits) {
+            console.error("One or more package detail modal elements not found.");
+            return;
+        }
+        detailPackageName.textContent = packageData.name;
+        detailOriginalDuration.textContent = `Masa Berlaku Awal: ${packageData.originalDuration}`;
+
+        detailBenefits.innerHTML = '';
+        if (packageData.benefits && packageData.benefits.length > 0) {
+            packageData.benefits.forEach(benefit => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fas fa-check-circle text-green-500 mr-2"></i> ${benefit}`;
+                detailBenefits.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'Tidak ada manfaat spesifik yang terdaftar.';
+            detailBenefits.appendChild(li);
+        }
+        showElement(packageDetailModal);
+    }
+
+    /**
+     * Renders the list of user packages that are expired or expiring soon.
+     */
+    function renderUserPackages() {
+        if (!userPackagesContainer || !noPackagesMessage) {
+            console.error("User packages container or no packages message element not found.");
+            return;
+        }
+
+        userPackagesContainer.innerHTML = '';
+        const userPackages = JSON.parse(localStorage.getItem('userPackages') || '[]');
+        const now = new Date();
+        
+        // Filter packages that are expired or expiring within 30 days, and not lifetime
+        const relevantPackages = userPackages.filter(pkg => {
+            if (pkg.accessModel === 'lifetime') return false; // Exclude lifetime packages
+            const expiryDate = new Date(pkg.expiryDate);
+            const diffTime = expiryDate.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays <= 30 || diffDays < 0; // Expiring in 30 days or already expired
+        });
+
+        // Sort: expiring soonest first, then expired oldest first
+        relevantPackages.sort((a, b) => {
+            const dateA = new Date(a.expiryDate);
+            const dateB = new Date(b.expiryDate);
+            return dateA.getTime() - dateB.getTime();
+        });
+
+        if (relevantPackages.length === 0) {
+            showElement(noPackagesMessage);
+            return;
+        } else {
+            hideElement(noPackagesMessage);
+        }
+
+        relevantPackages.forEach(pkg => {
+            const isExpired = new Date(pkg.expiryDate) < now;
+            const statusText = isExpired ? `Kadaluarsa Sejak ${formatDate(new Date(pkg.expiryDate))}` : `Akan Kadaluarsa pada ${formatDate(new Date(pkg.expiryDate))}`;
+            const statusColor = isExpired ? 'text-red-600' : 'text-orange-500';
+            const cardBorderColor = isExpired ? 'border-red-400' : 'border-orange-400';
+            const currentPrice = pkg.originalPrice; // Use original price for initial display
+
+            const packageCard = document.createElement('div');
+            packageCard.className = `bg-gradient-card p-6 rounded-lg shadow-md card-hover relative border-2 ${cardBorderColor} flex flex-col`;
+            packageCard.innerHTML = `
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">${pkg.name}</h3>
+                <p class="text-sm ${statusColor} font-bold mb-2">${statusText}</p>
+                <p class="text-gray-600 text-sm mb-4">Masa Berlaku Awal: ${pkg.originalDuration}</p>
+                
+                <div class="mb-4">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Manfaat:</h4>
+                    <ul class="list-disc list-inside text-gray-700 text-sm space-y-1">
+                        ${pkg.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-gray-200">
+                    <h4 class="text-md font-semibold text-gray-800 mb-2">Opsi Perpanjangan:</h4>
+                    <div class="mb-4">
+                        <select class="renewal-duration-select w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-600">
+                            <option value="">Pilih Durasi</option>
+                            <option value="+3 Bulan">Perpanjang +3 Bulan (Rp ${calculateRenewalPrice(pkg, '+3 Bulan').toLocaleString('id-ID')})</option>
+                            <option value="+6 Bulan">Perpanjang +6 Bulan (Rp ${calculateRenewalPrice(pkg, '+6 Bulan').toLocaleString('id-ID')})</option>
+                            <option value="+1 Tahun">Perpanjang +1 Tahun (Rp ${calculateRenewalPrice(pkg, '+1 Tahun').toLocaleString('id-ID')})</option>
+                            ${pkg.accessModel !== 'lifetime' ? '<option value="Lifetime">Upgrade Lifetime (Harga Spesial: Rp ' + (pkg.originalPrice * 5).toLocaleString('id-ID') + ')</option>' : ''}
+                        </select>
+                        <p class="current-renewal-price text-gray-700 text-right mt-2 font-semibold">Harga: Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button class="action-button renew-button w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed" data-package-id="${pkg.id}" disabled>
+                        <i class="fas fa-sync-alt mr-2"></i> Perpanjang Sekarang
+                    </button>
+                    ${pkg.upgradePath ? `
+                    <button class="action-button upgrade-button w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition-all flex items-center justify-center" data-package-id="${pkg.id}" data-upgrade-target="${pkg.upgradePath.name}">
+                        <i class="fas fa-arrow-up mr-2"></i> Upgrade ke ${pkg.upgradePath.name}
+                    </button>` : ''}
+                    <button class="action-button detail-button w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all flex items-center justify-center" data-package-id="${pkg.id}">
+                        <i class="fas fa-info-circle mr-2"></i> Lihat Detail Paket
+                    </button>
+                </div>
+            `;
+            userPackagesContainer.appendChild(packageCard);
+
+            // Add event listeners for dynamic elements
+            const selectElement = packageCard.querySelector('.renewal-duration-select');
+            const renewButton = packageCard.querySelector('.renew-button');
+            const currentPriceDisplay = packageCard.querySelector('.current-renewal-price');
+
+            selectElement.addEventListener('change', (event) => {
+                const selectedDuration = event.target.value;
+                if (selectedDuration) {
+                    const price = calculateRenewalPrice(pkg, selectedDuration);
+                    currentPriceDisplay.textContent = `Harga: Rp ${price.toLocaleString('id-ID')}`;
+                    renewButton.disabled = false;
+                    renewButton.setAttribute('data-duration', selectedDuration);
+                    renewButton.setAttribute('data-price', price);
+                } else {
+                    currentPriceDisplay.textContent = `Harga: Rp 0`;
+                    renewButton.disabled = true;
+                    renewButton.removeAttribute('data-duration');
+                    renewButton.removeAttribute('data-price');
+                }
+            });
+
+            // Add click listener for renew button (opens modal)
+            renewButton.addEventListener('click', (event) => {
+                currentSelectedPackageForRenewal = pkg;
+                currentSelectedDurationForRenewal = event.target.getAttribute('data-duration');
+                currentSelectedPriceForRenewal = parseInt(event.target.getAttribute('data-price'));
+                
+                if (modalPackage) modalPackage.textContent = currentSelectedPackageForRenewal.name;
+                if (modalDuration) modalDuration.textContent = currentSelectedDurationForRenewal;
+                if (modalAmount) modalAmount.textContent = `Rp ${currentSelectedPriceForRenewal.toLocaleString('id-ID')}`;
+                
+                // Reset modal payment method selection
+                selectModalMethods.forEach(btn => btn.classList.remove('bg-blue-200'));
+                currentSelectedMethodForRenewal = null;
+                hideElement(modalMethodInstruction);
+                if (confirmRenewalBtn) confirmRenewalBtn.disabled = true;
+
+                showElement(renewalModal);
+            });
+
+            // Add click listener for upgrade button
+            const upgradeButton = packageCard.querySelector('.upgrade-button');
+            if (upgradeButton) {
+                upgradeButton.addEventListener('click', (event) => {
+                    const targetUpgradeName = event.target.getAttribute('data-upgrade-target');
+                    const targetPackageData = allAvailablePackages[targetUpgradeName]; // Get full details from global list
+                    if (targetPackageData) {
+                        // Simulate redirect to a dedicated upgrade page or a modal with comparison
+                        showToastNotification(`Mengarahkan ke halaman Upgrade untuk ${targetUpgradeName}...`, 'info');
+                        // For this demo, we'll redirect to paket.html as a placeholder
+                        setTimeout(() => { window.location.href = `paket.html?upgrade=${encodeURIComponent(targetUpgradeName)}`; }, 500);
+                    } else {
+                        showToastNotification('Informasi paket upgrade tidak ditemukan.', 'error');
+                    }
+                });
+            }
+
+            // Add click listener for detail button
+            const detailButton = packageCard.querySelector('.detail-button');
+            if (detailButton) {
+                detailButton.addEventListener('click', () => showPackageDetailModal(pkg));
+            }
+        });
+    }
+
+    /**
+     * Checks if any packages are expiring soon and displays a banner.
+     */
+    function checkExpiryNotification() {
+        const userPackages = JSON.parse(localStorage.getItem('userPackages') || '[]');
+        const now = new Date();
+        let expiringSoonCount = 0;
+
+        userPackages.forEach(pkg => {
+            if (pkg.accessModel === 'lifetime') return; // Exclude lifetime packages
+
+            const expiryDate = new Date(pkg.expiryDate);
+            const diffTime = expiryDate.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            if (diffDays <= 30 && diffDays >= 0) { // Expiring within 30 days
+                expiringSoonCount++;
+            }
+        });
+
+        if (expiringSoonCount > 0) {
+            if (expiryNotificationBanner) {
+                if (bannerMessage) {
+                    bannerMessage.textContent = `Akses ${expiringSoonCount} paket Anda akan segera habis. Perpanjang sekarang!`;
+                }
+                showElement(expiryNotificationBanner);
+            }
+        } else {
+            if (expiryNotificationBanner) hideElement(expiryNotificationBanner);
+        }
+    }
+
+
+    // --- Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+        renderUserPackages(); // Initial render of relevant packages
+        checkExpiryNotification(); // Check and display expiry banner
+
+        // Mobile menu toggle
+        if (menuBtn && mobileMenu) {
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuBtn.querySelector('i').classList.toggle('fa-bars');
+                menuBtn.querySelector('i').classList.toggle('fa-times');
+            });
+        }
+
+        // Scroll progress bar
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (docHeight > 0) ? (scrollTop / docHeight) * 100 : 0;
+            if (scrollProgress) scrollProgress.style.width = scrollPercent + '%';
+        });
+
+        // Back-to-top button
+        window.addEventListener('scroll', () => {
+            if (backToTop) {
+                if (window.scrollY > 300) {
+                    showElement(backToTop);
+                } else {
+                    hideElement(backToTop);
+                }
+            }
+        });
+        if (backToTop) {
+          backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
+
+        // Renewal Modal Payment Method Selection
+        selectModalMethods.forEach(button => {
+            button.addEventListener('click', () => {
+                selectModalMethods.forEach(btn => btn.classList.remove('bg-blue-200', 'border-blue-500'));
+                button.classList.add('bg-blue-200', 'border-blue-500');
+                currentSelectedMethodForRenewal = button.getAttribute('data-method');
+                if (selectedModalMethodSpan) selectedModalMethodSpan.textContent = currentSelectedMethodForRenewal;
+                if (modalMethodInstruction) showElement(modalMethodInstruction);
+                if (confirmRenewalBtn) confirmRenewalBtn.disabled = false;
+            });
+        });
+
+        // Renewal Modal - Cancel Button
+        if (cancelRenewalBtn) {
+            cancelRenewalBtn.addEventListener('click', () => {
+                hideElement(renewalModal);
+                currentSelectedMethodForRenewal = null; // Reset method
+                if (confirmRenewalBtn) confirmRenewalBtn.disabled = true; // Disable confirm again
+            });
+        }
+        
+
+        // Renewal Modal - Confirm Button (Simulate Payment)
+        if (confirmRenewalBtn) {
+            confirmRenewalBtn.addEventListener('click', () => {
+                if (!currentSelectedPackageForRenewal || !currentSelectedDurationForRenewal || !currentSelectedMethodForRenewal) {
+                    showToastNotification('Detail perpanjangan tidak lengkap. Silakan coba lagi.', 'error');
+                    return;
+                }
+
+                hideElement(renewalModal); // Hide modal
+                showToastNotification('Memproses pembayaran...', 'info');
+                
+                // Simulate payment success/failure
+                setTimeout(() => {
+                    // Always simulate success for this demo
+                    const userPackages = JSON.parse(localStorage.getItem('userPackages') || '[]');
+                    const updatedPackages = userPackages.map(pkg => {
+                        if (pkg.id === currentSelectedPackageForRenewal.id) {
+                            let newExpiry = '';
+                            if (currentSelectedDurationForRenewal === 'Lifetime') {
+                                newExpiry = 'Lifetime';
+                                pkg.accessModel = 'lifetime'; // Change access model to lifetime
+                            } else {
+                                const baseExpiryDate = new Date(pkg.expiryDate);
+                                // If already expired, start renewal from today, else from current expiry
+                                const startRenewalFrom = (baseExpiryDate < new Date()) ? new Date() : baseExpiryDate;
+                                newExpiry = calculateNewExpiryDate(startRenewalFrom, currentSelectedDurationForRenewal);
+                                newExpiry = newExpiry instanceof Date ? formatDate(newExpiry) : newExpiry;
+                            }
+                            
+                            return {
+                                ...pkg,
+                                expiryDate: newExpiry,
+                                purchaseDate: formatDate(new Date()) // Update purchase date to today for renewal record
+                            };
+                        }
+                        return pkg;
+                    });
+
+                    localStorage.setItem('userPackages', JSON.stringify(updatedPackages));
+                    
+                    showToastNotification('Paket berhasil diperpanjang! Akses Anda telah diperbarui.', 'success');
+                    renderUserPackages(); // Re-render the list to show updated status
+                    checkExpiryNotification(); // Re-check banner status
+                    
+                    // Optional: Redirect to Akun page after successful renewal
+                    setTimeout(() => {
+                        window.location.href = 'akun.html';
+                    }, 1500);
+
+                }, 2000); // Simulate 2-second payment processing
+            });
+        }
+
+        // Close Package Detail Modal
+        if (closeDetailModalBtn) {
+            closeDetailModalBtn.addEventListener('click', () => {
+                hideElement(packageDetailModal);
+            });
+        }
+
+        // Close Expiry Notification Banner
+        if (closeBannerBtn) {
+            closeBannerBtn.addEventListener('click', () => {
+                hideElement(expiryNotificationBanner);
+            });
+        }
+
+        // Show loading spinner on page transition
+        document.querySelectorAll('a[href]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href && !href.startsWith('#') && !href.includes('whatsapp') && !link.href.includes('instagram') && !link.href.includes('twitter') && !link.href.includes('facebook') && !link.href.includes('youtube') && !href.includes('mailto:')) {
+                    if (loadingScreen) {
+                        showElement(loadingScreen);
+                    }
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                if (navbar) navbar.classList.add('scrolled', 'shadow-lg');
+            } else {
+                if (navbar) navbar.classList.remove('scrolled', 'shadow-lg');
+            }
+        });
+    });
   </script>
 </body>
 </html>
